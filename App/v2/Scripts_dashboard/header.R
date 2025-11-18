@@ -23,23 +23,9 @@
 #   - tags$li(...): permite insertar elementos personalizados.
 # =============================================================
 
-###############################################################
-# 🧭 Encabezado (Header) del Dashboard
-###############################################################
-
 app_header <- shinydashboard::dashboardHeader(
-  titleWidth = 280,  # 🔹 Más ancho para que quepa el texto completo
-  title = tagList(
-    # Icono tipo logo (fontawesome)
-    shiny::icon("chart-bar"),
-    # Texto del título
-    tags$span(
-      "Muestreo de Auditoría",
-      style = "font-weight:600; margin-left:8px;"
-    )
-  )
+  title = "📊 Muestreo de Auditoría"  # título mostrado en la barra superior
 )
-
 
 # =============================================================
 # (2) Alias para compatibilidad retroactiva

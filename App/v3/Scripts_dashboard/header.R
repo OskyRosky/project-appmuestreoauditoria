@@ -24,7 +24,16 @@
 # =============================================================
 
 app_header <- shinydashboard::dashboardHeader(
-  title = "📊 Muestreo de Auditoría"  # título mostrado en la barra superior
+  titleWidth = 280,  # 🔹 Más ancho para que quepa el texto completo
+  title = tagList(
+    # Icono tipo logo (fontawesome)
+    shiny::icon("chart-bar"),
+    # Texto del título
+    tags$span(
+      "📊 Muestreo de Auditoría",
+      style = "font-weight:600; margin-left:8px;"
+    )
+  )
 )
 
 # =============================================================
