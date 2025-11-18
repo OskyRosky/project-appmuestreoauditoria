@@ -10,7 +10,7 @@
 
 body <- shinydashboard::dashboardBody(
 
- # --- Tema oscuro + estilos de footer ---
+  # --- Tema oscuro + estilos de footer ---
   tags$head(
     # JS para agregar/quitar la clase .dark-mode en el <body>
     tags$script(HTML("
@@ -78,19 +78,6 @@ body <- shinydashboard::dashboardBody(
       }
     "))
   ),
-
-  # ... aquí va TODO lo que ya tienes en el body (tabs, boxes, etc.) ...
-
-  # --- Footer al final del body ---
-  tags$footer(
-    class = "app-footer",
-    tags$span("Muestreo de Auditoría – Herramienta de apoyo al muestreo financiero"),
-    tags$span(
-      style = "float:right;",
-      paste0("© ", format(Sys.Date(), '%Y'), " Contraloría General de la República")
-    )
-  )
-),
 
   #################################################################
   #                       AVISO GLOBAL (NEW)                      #
@@ -900,10 +887,16 @@ body <- shinydashboard::dashboardBody(
       )
     )
 
-  ) # /tabItems
+  ), # /tabItems
 
+  # --- Footer al final del body ---
+  tags$footer(
+    class = "app-footer",
+    tags$span("Muestreo de Auditoría – Herramienta de apoyo al muestreo financiero"),
+    tags$span(
+      style = "float:right;",
+      paste0("© ", format(Sys.Date(), '%Y'), " Contraloría General de la República")
+    )
+  )
 
-
-
-  
 )   # /dashboardBody
