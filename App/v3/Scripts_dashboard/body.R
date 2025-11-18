@@ -10,6 +10,88 @@
 
 body <- shinydashboard::dashboardBody(
 
+ # --- Tema oscuro + estilos de footer ---
+  tags$head(
+    # JS para agregar/quitar la clase .dark-mode en el <body>
+    tags$script(HTML("
+      Shiny.addCustomMessageHandler('toggle-dark-mode', function(message) {
+        if (message.active) {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
+      });
+    ")),
+    # CSS básico para modo oscuro + footer
+    tags$style(HTML("
+      /* ------------------- Dark mode ------------------- */
+      body.dark-mode {
+        background-color: #0f172a;
+        color: #e5e7eb;
+      }
+      body.dark-mode .skin-blue .main-header .navbar {
+        background-color: #111827;
+      }
+      body.dark-mode .skin-blue .main-header .logo {
+        background-color: #111827;
+      }
+      body.dark-mode .skin-blue .main-sidebar,
+      body.dark-mode .skin-blue .left-side {
+        background-color: #020617;
+      }
+      body.dark-mode .content-wrapper,
+      body.dark-mode .right-side {
+        background-color: #0f172a;
+      }
+      body.dark-mode .box {
+        background-color: #020617;
+        border-color: #1f2937;
+      }
+      body.dark-mode .box-header,
+      body.dark-mode .box-title,
+      body.dark-mode .box-body {
+        color: #e5e7eb;
+      }
+
+      /* ------------------- Footer ------------------- */
+      .app-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 26px;
+        padding: 4px 18px;
+        background-color: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        color: #6b7280;
+        font-size: 11px;
+        z-index: 1000;
+      }
+      body.dark-mode .app-footer {
+        background-color: #020617;
+        border-top-color: #1f2937;
+        color: #9ca3af;
+      }
+      /* Para que el contenido no quede tapado por el footer */
+      .content-wrapper {
+        padding-bottom: 40px;
+      }
+    "))
+  ),
+
+  # ... aquí va TODO lo que ya tienes en el body (tabs, boxes, etc.) ...
+
+  # --- Footer al final del body ---
+  tags$footer(
+    class = "app-footer",
+    tags$span("Muestreo de Auditoría – Herramienta de apoyo al muestreo financiero"),
+    tags$span(
+      style = "float:right;",
+      paste0("© ", format(Sys.Date(), '%Y'), " Contraloría General de la República")
+    )
+  )
+),
+
   #################################################################
   #                       AVISO GLOBAL (NEW)                      #
   #################################################################
@@ -819,89 +901,9 @@ body <- shinydashboard::dashboardBody(
     )
 
   ) # /tabItems
- # --- Tema oscuro + estilos de footer ---
-  tags$head(
-    # JS para agregar/quitar la clase .dark-mode en el <body>
-    tags$script(HTML("
-      Shiny.addCustomMessageHandler('toggle-dark-mode', function(message) {
-        if (message.active) {
-          document.body.classList.add('dark-mode');
-        } else {
-          document.body.classList.remove('dark-mode');
-        }
-      });
-    ")),
-    # CSS básico para modo oscuro + footer
-    tags$style(HTML("
-      /* ------------------- Dark mode ------------------- */
-      body.dark-mode {
-        background-color: #0f172a;
-        color: #e5e7eb;
-      }
-      body.dark-mode .skin-blue .main-header .navbar {
-        background-color: #111827;
-      }
-      body.dark-mode .skin-blue .main-header .logo {
-        background-color: #111827;
-      }
-      body.dark-mode .skin-blue .main-sidebar,
-      body.dark-mode .skin-blue .left-side {
-        background-color: #020617;
-      }
-      body.dark-mode .content-wrapper,
-      body.dark-mode .right-side {
-        background-color: #0f172a;
-      }
-      body.dark-mode .box {
-        background-color: #020617;
-        border-color: #1f2937;
-      }
-      body.dark-mode .box-header,
-      body.dark-mode .box-title,
-      body.dark-mode .box-body {
-        color: #e5e7eb;
-      }
-
-      /* ------------------- Footer ------------------- */
-      .app-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 26px;
-        padding: 4px 18px;
-        background-color: #f9fafb;
-        border-top: 1px solid #e5e7eb;
-        color: #6b7280;
-        font-size: 11px;
-        z-index: 1000;
-      }
-      body.dark-mode .app-footer {
-        background-color: #020617;
-        border-top-color: #1f2937;
-        color: #9ca3af;
-      }
-      /* Para que el contenido no quede tapado por el footer */
-      .content-wrapper {
-        padding-bottom: 40px;
-      }
-    "))
-  ),
-
-  # ... aquí va TODO lo que ya tienes en el body (tabs, boxes, etc.) ...
-
-  # --- Footer al final del body ---
-  tags$footer(
-    class = "app-footer",
-    tags$span("Muestreo de Auditoría – Herramienta de apoyo al muestreo financiero"),
-    tags$span(
-      style = "float:right;",
-      paste0("© ", format(Sys.Date(), '%Y'), " Contraloría General de la República")
-    )
-  )
 
 
 
 
-
+  
 )   # /dashboardBody
