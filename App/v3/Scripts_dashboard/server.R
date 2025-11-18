@@ -157,6 +157,37 @@ server <- function(input, output, session) {
   output$showDownloads <- reactive({ is_heavy })
   outputOptions(output, "showDownloads", suspendWhenHidden = FALSE)
 
+ # ============================================================
+  #  🟢 Welcome Guide  (abre un modal con instrucciones básicas)
+  # ============================================================
+  observeEvent(input$welcome_guide, {
+    showModal(
+      modalDialog(
+        title = "Guía rápida de la aplicación",
+        size = "l",
+        easyClose = TRUE,
+        footer = modalButton("Cerrar"),
+        tags$ol(
+          tags$li("Use la pestaña 'Descriptivo' para cargar los datos y revisar las estadísticas básicas."),
+          tags$li("En 'Muestra MUM' y 'Muestra LES' configure los parámetros de muestreo y genere las muestras."),
+          tags$li("En 'Muestra Atributos' trabaje con poblaciones categóricas o de cumplimiento."),
+          tags$li("En 'Evaluación' consolide resultados, errores proyectados y conclusiones."),
+          tags$li("En cada módulo puede descargar reportes en .xlsx o .docx para adjuntarlos al expediente.")
+        )
+      )
+    )
+  })
+
+  # ============================================================
+  #  🌗 Modo oscuro: envía el estado al frontend (JS)
+  # ============================================================
+  observe({
+    session$sendCustomMessage(
+      "toggle-dark-mode",
+      list(active = isTRUE(input$dark_mode))
+    )
+  })
+
   # =====================================================================
   # 1) ANÁLISIS DESCRIPTIVO (p2)  - fileInput: file1
   # =====================================================================
