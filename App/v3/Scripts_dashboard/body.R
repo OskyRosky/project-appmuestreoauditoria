@@ -10,7 +10,7 @@
 
 body <- shinydashboard::dashboardBody(
 
-  # --- Tema claro del header + modo oscuro + footer ---
+  # --- Tema oscuro + estilos de footer ---
   tags$head(
     # JS para agregar/quitar la clase .dark-mode en el <body>
     tags$script(HTML("
@@ -22,59 +22,8 @@ body <- shinydashboard::dashboardBody(
         }
       });
     ")),
-
-    # CSS: header claro + estilos generales + dark mode + footer
+    # CSS básico para modo oscuro + footer
     tags$style(HTML("
-      /* --------------------------------------------------
-       * Header en modo claro (tema blue por defecto)
-       * -------------------------------------------------- */
-      .skin-blue .main-header .navbar {
-        background-color: #ffffff;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .skin-blue .main-header .logo {
-        background-color: #ffffff;
-        color: #111827;
-        border-bottom: 1px solid #e5e7eb;
-        font-weight: 600;
-      }
-
-      .skin-blue .main-header .navbar .sidebar-toggle {
-        color: #111827;
-      }
-
-      .skin-blue .main-header .navbar .sidebar-toggle:hover {
-        background-color: #f3f4f6;
-      }
-
-      /* Layout interno del header */
-      .app-header-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .app-header-title {
-        font-weight: 600;
-        font-size: 18px;
-        margin-left: 4px;
-      }
-
-      .app-header-guide-btn {
-        margin-left: 16px;
-        padding: 4px 12px;
-        font-size: 12px;
-        font-weight: 500;
-        background-color: #15803d;
-        border-color: #15803d;
-      }
-
-      .app-header-guide-btn:hover {
-        background-color: #166534;
-        border-color: #166534;
-      }
-
       /* ------------------- Dark mode ------------------- */
       body.dark-mode {
         background-color: #0f172a;
