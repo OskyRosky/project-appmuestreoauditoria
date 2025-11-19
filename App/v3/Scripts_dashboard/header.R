@@ -24,49 +24,46 @@
 # =============================================================
 
 app_header <- shinydashboard::dashboardHeader(
-  titleWidth = 320,
-  
-  # ==========================================================
-  #  TÍTULO + BOTÓN "WELCOME GUIDE"
-  #  (aparecen inmediatamente a la derecha del botón ≡)
-  # ==========================================================
-  title = tags$div(
-    style = "display:flex; align-items:center;",
-    
-    # Botón Welcome Guide
-    actionButton(
-      inputId = "welcome_guide",
-      label   = tagList(icon("info-circle"), "Welcome Guide"),
-      class   = "btn btn-success btn-sm",
-      style   = "margin-right:12px;"
-    ),
-    
-    # Icono + texto del título
+  titleWidth = 260,
+  title = tagList(
+    # Icono + texto
     tags$span(
       icon("chart-bar"),
-      style = "margin-right:6px;"
-    ),
-    tags$span(
-      "Muestreo Auditoría",
-      style = "font-weight:600;"
+      tags$span("Muestreo Auditoría",
+                style = "font-weight:600; margin-left:6px;")
     )
   ),
-  
-  # ==========================================================
-  #  SWITCH DÍA / NOCHE (EXTREMO DERECHO)
-  # ==========================================================
+  # --- Botón Welcome Guide (lado derecho) ---
+  tags$li(
+    class = "dropdown",
+    style = "padding:8px 10px;",
+    actionButton(
+      inputId = "welcome_guide",
+      label = tagList(
+        icon("info-circle"),
+        tags$span("Welcome Guide")
+      ),
+      class = "btn btn-success btn-sm"
+    )
+  ),
+  # --- Switch Day / Night (lado derecho) ---
   tags$li(
     class = "dropdown",
     style = "padding:12px 20px 0 10px;",
     shinyWidgets::materialSwitch(
       inputId = "dark_mode",
-      label   = NULL,
-      value   = FALSE,
-      status  = "primary",
-      right   = TRUE
+      label = NULL,
+      value = FALSE,
+      status = "primary",
+      right = TRUE
     )
   )
 )
-
-# Alias para compatibilidad
+# =============================================================
+# (2) Alias para compatibilidad retroactiva
+# -------------------------------------------------------------
+# Si el código anterior hacía referencia a `header` (sin prefijo),
+# mantenemos esta asignación para evitar errores mientras
+# actualizamos la estructura general.
+# =============================================================
 header <- app_header
