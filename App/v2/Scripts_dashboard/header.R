@@ -1,6 +1,9 @@
 ###############################################################
 # 🧭 Encabezado (Header) del Dashboard
 # -------------------------------------------------------------
+# Este script define la barra superior de la aplicación Shiny,
+# visible en todas las pestañas del dashboard.
+#
 # Define la barra superior visible en todas las pestañas.
 #
 # En esta versión:
@@ -10,40 +13,25 @@
 #     (switch día/noche, chat, compartir, etc.).
 ###############################################################
 
+# =============================================================
+# (1) Definición básica del encabezado
+# -------------------------------------------------------------
+# dashboardHeader() proviene del paquete {shinydashboard}.
+# Acepta parámetros como:
+#   - title: texto o HTML (por ejemplo, iconos o logotipos)
+#   - titleWidth: ancho fijo del título (opcional)
+#   - tags$li(...): permite insertar elementos personalizados.
+# =============================================================
+
 app_header <- shinydashboard::dashboardHeader(
-  titleWidth = 320,
-
-  # ------------------- Zona izquierda: título + botón guía -------------------
-  title = tags$div(
-    class = "app-header-left",
-    # Icono (puedes cambiarlo por un logo si quieres)
-    shiny::icon("chart-bar"),
-
-    # Texto del título
-    tags$span(
-      "Muestreo Auditoría",
-      class = "app-header-title"
-    ),
-
-    # Botón Welcome Guide (acción la conectaremos después)
-    actionButton(
-      inputId = "open_guide",
-      label   = "Welcome Guide",
-      icon    = icon("info-circle"),
-      class   = "btn btn-success btn-sm app-header-guide-btn"
-    )
-  )
-
-  # ------------------- Zona derecha (vacía por ahora) -------------------
-  # En las siguientes etapas agregaremos aquí:
-  #   • Switch día/noche
-  #   • Icono de feedback (chat)
-  #   • Icono de compartir
-  #
-  # Ejemplo de placeholder (lo dejamos comentado por ahora):
-  # ,
-  # tags$li(class = "dropdown app-header-right-area")
+  title = "📊 Muestreo de Auditoría"  # título mostrado en la barra superior
 )
 
-# Alias para compatibilidad con el resto del código
+# =============================================================
+# (2) Alias para compatibilidad retroactiva
+# -------------------------------------------------------------
+# Si el código anterior hacía referencia a `header` (sin prefijo),
+# mantenemos esta asignación para evitar errores mientras
+# actualizamos la estructura general.
+# =============================================================
 header <- app_header

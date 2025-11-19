@@ -1,69 +1,49 @@
 ###############################################################
 # 🧭 Encabezado (Header) del Dashboard
 # -------------------------------------------------------------
-# Este script define la barra superior de la aplicación Shiny,
-# visible en todas las pestañas del dashboard.
+# Define la barra superior visible en todas las pestañas.
 #
-# Contiene:
-#   • Título principal del sistema.
-#   • (Opcional) espacio para menús, iconos o notificaciones.
-#
-# NOTA:
-#   Este objeto se pasa directamente al argumento `header`
-#   dentro de `dashboardPage()` en el archivo ui.R.
+# En esta versión:
+#   • Título “Muestreo Auditoría” con icono.
+#   • Botón "Welcome Guide" colocado a la izquierda del header.
+#   • Dejamos un espacio a la derecha para futuros controles
+#     (switch día/noche, chat, compartir, etc.).
 ###############################################################
 
-# =============================================================
-# (1) Definición básica del encabezado
-# -------------------------------------------------------------
-# dashboardHeader() proviene del paquete {shinydashboard}.
-# Acepta parámetros como:
-#   - title: texto o HTML (por ejemplo, iconos o logotipos)
-#   - titleWidth: ancho fijo del título (opcional)
-#   - tags$li(...): permite insertar elementos personalizados.
-# =============================================================
-
 app_header <- shinydashboard::dashboardHeader(
-  titleWidth = 260,
-  title = tagList(
-    # Icono + texto
+  titleWidth = 320,
+
+  # ------------------- Zona izquierda: título + botón guía -------------------
+  title = tags$div(
+    class = "app-header-left",
+    # Icono (puedes cambiarlo por un logo si quieres)
+    shiny::icon("chart-bar"),
+
+    # Texto del título
     tags$span(
-      icon("chart-bar"),
-      tags$span("Muestreo Auditoría",
-                style = "font-weight:600; margin-left:6px;")
-    )
-  ),
-  # --- Botón Welcome Guide (lado derecho) ---
-  tags$li(
-    class = "dropdown",
-    style = "padding:8px 10px;",
+      "Muestreo Auditoría",
+      class = "app-header-title"
+    ),
+
+    # Botón Welcome Guide (acción la conectaremos después)
     actionButton(
-      inputId = "welcome_guide",
-      label = tagList(
-        icon("info-circle"),
-        tags$span("Welcome Guide")
-      ),
-      class = "btn btn-success btn-sm"
-    )
-  ),
-  # --- Switch Day / Night (lado derecho) ---
-  tags$li(
-    class = "dropdown",
-    style = "padding:12px 20px 0 10px;",
-    shinyWidgets::materialSwitch(
-      inputId = "dark_mode",
-      label = NULL,
-      value = FALSE,
-      status = "primary",
-      right = TRUE
+      inputId = "open_guide",
+      label   = "Welcome Guide",
+      icon    = icon("info-circle"),
+      class   = "btn btn-success btn-sm app-header-guide-btn"
     )
   )
+
+  # ------------------- Zona derecha (vacía por ahora) -------------------
+  # En las siguientes etapas agregaremos aquí:
+  #   • Switch día/noche
+  #   • Icono de feedback (chat)
+  #   • Icono de compartir
+  #
+  # Ejemplo de placeholder (lo dejamos comentado por ahora):
+  # ,
+  # tags$li(class = "dropdown app-header-right-area")
 )
-# =============================================================
-# (2) Alias para compatibilidad retroactiva
-# -------------------------------------------------------------
-# Si el código anterior hacía referencia a `header` (sin prefijo),
-# mantenemos esta asignación para evitar errores mientras
-# actualizamos la estructura general.
-# =============================================================
+
+# Alias para compatibilidad con el resto del código
 header <- app_header
