@@ -58,7 +58,7 @@ app_header <- shinydashboard::dashboardHeader(
       right = TRUE
     )
   )
-)
+) 
 # =============================================================
 # (2) Alias para compatibilidad retroactiva
 # -------------------------------------------------------------
