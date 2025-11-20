@@ -885,7 +885,64 @@ body <- shinydashboard::dashboardBody(
         condition = "output.showDownloads",                       # NEW
         downloadButton("downloadReport5", "Descargar Reporte Evaluación")
       )
+    ),
+
+shinydashboard::tabItem(
+      tabName = "faq",
+
+      h1("Preguntas frecuentes (FAQ)", align = "center"),
+      br(),
+
+      fluidRow(
+        shinydashboard::box(
+          title = "¿Qué formatos de archivo acepta la aplicación?",
+          status = "primary", solidHeader = TRUE, width = 12,
+          p("Puede cargar archivos en formato ",
+            strong(".xlsx, .csv o .txt"),
+            ". Cada archivo debe contener una sola tabla y estar limpio para el análisis.")
+        )
+      ),
+
+      fluidRow(
+        shinydashboard::box(
+          title = "¿Cuál es el tamaño máximo permitido por archivo?",
+          status = "primary", solidHeader = TRUE, width = 12,
+          p("El peso máximo recomendado por archivo es de ",
+            strong("100 MB"),
+            ", para mantener un desempeño fluido en la aplicación.")
+        )
+      ),
+
+      fluidRow(
+        shinydashboard::box(
+          title = "¿En qué módulos puedo generar reportes en .docx?",
+          status = "primary", solidHeader = TRUE, width = 12,
+          p("Se pueden generar reportes en formato ",
+            strong(".docx"),
+            " en los módulos de:"),
+          tags$ul(
+            tags$li("Análisis descriptivo"),
+            tags$li("Muestreo MUM"),
+            tags$li("Muestreo LES"),
+            tags$li("Muestreo por atributos"),
+            tags$li("Evaluación de la muestra")
+          )
+        )
+      ),
+
+      fluidRow(
+        shinydashboard::box(
+          title = "¿Qué hago si la aplicación no me deja descargar el reporte?",
+          status = "primary", solidHeader = TRUE, width = 12,
+          p("Verifique que la aplicación esté ejecutándose en modo pesado ",
+            code("APP_HEAVY = TRUE"),
+            " y que los paquetes ",
+            code("officer"), " y ", code("flextable"),
+            " estén instalados en el entorno de R.")
+        )
+      )
     )
+
 
   ), # /tabItems
 
