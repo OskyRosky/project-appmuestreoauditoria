@@ -130,7 +130,7 @@ body <- shinydashboard::dashboardBody(
 
       /* Item activo con caja completa */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li.active > a {
-        background-color: #007bff !important;
+        background-color: ##0c4a6e !important;
         color: #ffffff !important;
         border-radius: 4px;
         margin: 4px 8px;
@@ -138,7 +138,7 @@ body <- shinydashboard::dashboardBody(
 
       /* Hover con caja completa */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a:hover {
-        background-color: #3399ff !important;
+        background-color: ##0c4a6e !important;
         color: #ffffff !important;
         border-radius: 4px;
         margin: 4px 8px;
