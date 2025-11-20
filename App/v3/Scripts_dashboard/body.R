@@ -996,6 +996,16 @@ shinydashboard::tabItem(
     )
 
 
+  ), # /tabItems
+
+  # --- Footer al final del body ---
+  tags$footer(
+    class = "app-footer",
+    tags$span("Muestreo de Auditoría – Herramienta de apoyo al muestreo en Auditoría."),
+    tags$span(
+      style = "float:right;",
+      paste0("© ", format(Sys.Date(), '%Y'), "App Muestreo Ejemplo")
+    )
   )
 
 )   # /dashboardBody
