@@ -1,20 +1,25 @@
 ###############################################################
 # 🧭 Encabezado (Header) del Dashboard
-# -------------------------------------------------------------
+###############################################################
+
 app_header <- shinydashboard::dashboardHeader(
   titleWidth = 260,
+  
+  # --- Título (icono + texto) ---
   title = tagList(
     tags$span(
       icon("chart-bar"),
-      tags$span("Muestreo Auditoría",
-                style = "font-weight:600; margin-left:6px;")
+      tags$span(
+        "Muestreo Auditoría",
+        style = "font-weight:600; margin-left:6px;"
+      )
     )
   ),
   
-  # --- Welcome Guide (después del toggle sidebar) ---
+  # --- Welcome Guide (posicionado cerca de la izquierda) ---
   tags$li(
     class = "dropdown",
-    style = "position: absolute; left: 270px; top: 0; padding: 8px 10px;",
+    style = "position:absolute; left:270px; top:4px; padding:0 10px;",
     actionButton(
       inputId = "welcome_guide",
       label = tagList(
@@ -25,89 +30,54 @@ app_header <- shinydashboard::dashboardHeader(
     )
   ),
   
-  # --- Dropdown Menu: Comentarios/Feedback (centro-derecha) ---
-  tags$li(
-    class = "dropdown",
-    tags$a(
-      href = "#",
-      class = "dropdown-toggle",
-      `data-toggle` = "dropdown",
-      icon("comment"),
-      tags$span(class = "label label-warning", "")
-    ),
-    tags$ul(
-      class = "dropdown-menu",
-      tags$li(
-        tags$ul(
-          class = "menu",
-          tags$li(
-            tags$a(
-              href = "mailto:tu_email@ejemplo.com",
-              icon("envelope"),
-              " Enviar comentarios"
-            )
-          )
-        )
-      )
+  # --- ÍCONO DE CHAT (feedback por correo) -------------------
+  shinydashboard::dropdownMenu(
+    type = "messages",
+    icon = icon("comment"),
+    badgeStatus = NULL,
+    shinydashboard::messageItem(
+      from = "Comentarios y sugerencias",
+      message = "Envíe sus comentarios por correo",
+      icon   = icon("envelope"),
+      href   = "mailto:muestreo_auditoria@cgr.go.cr"
     )
   ),
   
-  # --- Dropdown Menu: Compartir en redes sociales (centro-derecha) ---
-  tags$li(
-    class = "dropdown",
-    tags$a(
-      href = "#",
-      class = "dropdown-toggle",
-      `data-toggle` = "dropdown",
-      icon("share-alt"),
-      tags$span(class = "label label-success", "")
+  # --- ÍCONO DE COMPARTIR (redes sociales) -------------------
+  shinydashboard::dropdownMenu(
+    type = "notifications",
+    icon = icon("share-alt"),
+    badgeStatus = NULL,
+    shinydashboard::notificationItem(
+      text = "Twitter",
+      icon = icon("twitter"),
+      href = "https://twitter.com/intent/tweet?text=Muestreo%20de%20Auditor%C3%ADa"
     ),
-    tags$ul(
-      class = "dropdown-menu",
-      tags$li(
-        tags$ul(
-          class = "menu",
-          tags$li(
-            tags$a(
-              href = "https://twitter.com/intent/tweet?text=Muestreo%20Auditoría",
-              target = "_blank",
-              icon("twitter"),
-              " Twitter"
-            )
-          ),
-          tags$li(
-            tags$a(
-              href = "https://www.facebook.com/sharer/sharer.php?u=tu_url_aqui",
-              target = "_blank",
-              icon("facebook"),
-              " Facebook"
-            )
-          ),
-          tags$li(
-            tags$a(
-              href = "https://www.linkedin.com/sharing/share-offsite/?url=tu_url_aqui",
-              target = "_blank",
-              icon("linkedin"),
-              " LinkedIn"
-            )
-          )
-        )
-      )
+    shinydashboard::notificationItem(
+      text = "Facebook",
+      icon = icon("facebook"),
+      href = "https://www.facebook.com/sharer/sharer.php?u=#"
+    ),
+    shinydashboard::notificationItem(
+      text = "Google+",
+      icon = icon("google-plus"),
+      href = "https://plus.google.com/share?url=#"
     )
   ),
   
-  # --- Switch Day / Night (EXTREMO DERECHO) ---
+  # --- Switch Day / Night (EXTREMO DERECHO) ------------------
   tags$li(
     class = "dropdown",
-    style = "padding: 12px 20px 0 20px; margin-left: auto;",
+    style = "padding: 12px 20px 0 20px; margin-left:auto;",
     shinyWidgets::materialSwitch(
       inputId = "dark_mode",
-      label = NULL,
-      value = FALSE,
+      label  = NULL,
+      value  = FALSE,
       status = "primary",
-      right = TRUE
+      right  = TRUE
     )
   )
 )
 
+# Alias para compatibilidad
 header <- app_header
