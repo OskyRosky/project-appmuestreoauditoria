@@ -11,7 +11,7 @@
 body <- shinydashboard::dashboardBody(
 
  # --- Tema oscuro + estilos de footer + estilos del sidebar (hover + active) ---
-  tags$head(
+ tags$head(
 
     # JS para el modo oscuro
     tags$script(HTML("
@@ -24,11 +24,37 @@ body <- shinydashboard::dashboardBody(
       });
     ")),
 
-    # 🟦 CSS - Dark Mode + Footer + Sidebar mejorado
+    # 🟦 CSS - Dark Mode + Footer + Sidebar mejorado + Header/Sidebar custom
     tags$style(HTML("
 
       /* --------------------------------------------------------- */
-      /*                      🌙 DARK MODE                         */
+      /*                      🌞 MODO CLARO: COLORES               */
+      /* --------------------------------------------------------- */
+
+      /* Header (barra superior) */
+      .skin-blue .main-header .navbar {
+        background-color: #0ea5e9 !important;  /* 🔵 color del header */
+      }
+
+      .skin-blue .main-header .logo {
+        background-color: #0ea5e9 !important;  /* 🔵 mismo color */
+      }
+
+      /* Sidebar (barra izquierda) */
+      .skin-blue .main-sidebar,
+      .skin-blue .left-side {
+        background-color: #111827 !important;  /* ⚫ gris oscuro tipo Tailwind slate-900 */
+      }
+
+      /* Texto de los items del sidebar */
+      .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a {
+        color: #e5e7eb !important;  /* letra gris clara */
+      }
+
+
+
+      /* --------------------------------------------------------- */
+      /*                      🌙 MODO OSCURO                       */
       /* --------------------------------------------------------- */
 
       body.dark-mode {
@@ -44,9 +70,9 @@ body <- shinydashboard::dashboardBody(
         background-color: #111827;
       }
 
-      body.dark-mode .skin-blue .main-sidebar,
-      body.dark-mode .skin-blue .left-side {
-        background-color: #020617;
+      body.dark-mode .main-sidebar,
+      body.dark-mode .left-side {
+        background-color: #020617 !important;
       }
 
       body.dark-mode .content-wrapper,
@@ -64,6 +90,7 @@ body <- shinydashboard::dashboardBody(
       body.dark-mode .box-body {
         color: #e5e7eb;
       }
+
 
 
       /* --------------------------------------------------------- */
@@ -96,6 +123,7 @@ body <- shinydashboard::dashboardBody(
       }
 
 
+
       /* --------------------------------------------------------- */
       /*               ⭐ SIDEBAR: Hover + Active full box         */
       /* --------------------------------------------------------- */
@@ -117,7 +145,7 @@ body <- shinydashboard::dashboardBody(
       }
 
     "))
-  ),
+),
 
   #################################################################
   #                       CONTENEDOR DE TABS                      #
