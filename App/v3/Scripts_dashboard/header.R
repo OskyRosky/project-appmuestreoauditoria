@@ -24,19 +24,20 @@
 # =============================================================
 
 app_header <- shinydashboard::dashboardHeader(
-  titleWidth = 260,
-  title = tagList(
-    # Icono + texto
+  titleWidth = 360,  # un poco más ancho para que quepan título + botón
+  title = tags$div(
+    style = "display:flex; align-items:center; gap:12px;",
+    
+    # Icono + texto (se mantiene igual)
     tags$span(
       icon("chart-bar"),
-      tags$span("Muestreo Auditoría",
-                style = "font-weight:600; margin-left:6px;")
-    )
-  ),
-  # --- Botón Welcome Guide (lado derecho) ---
-  tags$li(
-    class = "dropdown",
-    style = "padding:8px 10px;",
+      tags$span(
+        "Muestreo Auditoría",
+        style = "font-weight:600; margin-left:6px;"
+      )
+    ),
+    
+    # --- Botón Welcome Guide (queda pegado al lado izquierdo) ---
     actionButton(
       inputId = "welcome_guide",
       label = tagList(
@@ -46,7 +47,8 @@ app_header <- shinydashboard::dashboardHeader(
       class = "btn btn-success btn-sm"
     )
   ),
-  # --- Switch Day / Night (lado derecho) ---
+
+  # --- Switch Day / Night (sigue en el extremo derecho) ---
   tags$li(
     class = "dropdown",
     style = "padding:12px 20px 0 10px;",
@@ -55,10 +57,11 @@ app_header <- shinydashboard::dashboardHeader(
       label = NULL,
       value = FALSE,
       status = "primary",
-      right = TRUE
+      right  = TRUE
     )
   )
 )
+
 # =============================================================
 # (2) Alias para compatibilidad retroactiva
 # -------------------------------------------------------------
