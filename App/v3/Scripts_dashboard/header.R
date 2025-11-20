@@ -11,7 +11,7 @@ app_header <- shinydashboard::dashboardHeader(
     )
   ),
   
-  # --- Elementos del lado IZQUIERDO (después del toggle sidebar) ---
+  # --- Welcome Guide (después del toggle sidebar) ---
   tags$li(
     class = "dropdown",
     style = "position: absolute; left: 270px; top: 0; padding: 8px 10px;",
@@ -28,7 +28,7 @@ app_header <- shinydashboard::dashboardHeader(
   # --- Switch Day / Night (EXTREMO DERECHO) ---
   tags$li(
     class = "dropdown",
-    style = "padding: 12px 10px 0 10px;",
+    style = "padding: 12px 20px 0 20px; margin-left: auto;",
     shinyWidgets::materialSwitch(
       inputId = "dark_mode",
       label = NULL,
