@@ -24,7 +24,7 @@ app_header <- shinydashboard::dashboardHeader(
       inputId = "welcome_guide",
       label = tagList(
         icon("info-circle"),
-        tags$span("Welcome Guide", style = "margin-left:4px;")
+        tags$span("¡ Bienvenidos !", style = "margin-left:4px;")
       ),
       class = "btn btn-success btn-sm"
     )

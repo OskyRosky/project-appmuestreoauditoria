@@ -10,9 +10,10 @@
 
 body <- shinydashboard::dashboardBody(
 
-  # --- Tema oscuro + estilos de footer ---
+ # --- Tema oscuro + estilos de footer + estilos del sidebar (hover + active) ---
   tags$head(
-    # JS para agregar/quitar la clase .dark-mode en el <body>
+
+    # JS para el modo oscuro
     tags$script(HTML("
       Shiny.addCustomMessageHandler('toggle-dark-mode', function(message) {
         if (message.active) {
@@ -22,38 +23,53 @@ body <- shinydashboard::dashboardBody(
         }
       });
     ")),
-    # CSS básico para modo oscuro + footer
+
+    # 🟦 CSS - Dark Mode + Footer + Sidebar mejorado
     tags$style(HTML("
-      /* ------------------- Dark mode ------------------- */
+
+      /* --------------------------------------------------------- */
+      /*                      🌙 DARK MODE                         */
+      /* --------------------------------------------------------- */
+
       body.dark-mode {
         background-color: #0f172a;
         color: #e5e7eb;
       }
+
       body.dark-mode .skin-blue .main-header .navbar {
         background-color: #111827;
       }
+
       body.dark-mode .skin-blue .main-header .logo {
         background-color: #111827;
       }
+
       body.dark-mode .skin-blue .main-sidebar,
       body.dark-mode .skin-blue .left-side {
         background-color: #020617;
       }
+
       body.dark-mode .content-wrapper,
       body.dark-mode .right-side {
         background-color: #0f172a;
       }
+
       body.dark-mode .box {
         background-color: #020617;
         border-color: #1f2937;
       }
+
       body.dark-mode .box-header,
       body.dark-mode .box-title,
       body.dark-mode .box-body {
         color: #e5e7eb;
       }
 
-      /* ------------------- Footer ------------------- */
+
+      /* --------------------------------------------------------- */
+      /*                          🦶 FOOTER                        */
+      /* --------------------------------------------------------- */
+
       .app-footer {
         position: fixed;
         bottom: 0;
@@ -67,32 +83,40 @@ body <- shinydashboard::dashboardBody(
         font-size: 11px;
         z-index: 1000;
       }
+
       body.dark-mode .app-footer {
         background-color: #020617;
         border-top-color: #1f2937;
         color: #9ca3af;
       }
+
       /* Para que el contenido no quede tapado por el footer */
       .content-wrapper {
         padding-bottom: 40px;
       }
-    "))
-  ),
 
-  #################################################################
-  #                       AVISO GLOBAL (NEW)                      #
-  #################################################################
-  conditionalPanel(
-    condition = "!output.showDownloads",  # NEW
-    tags$div(
-      style = "background:#fff3cd;border:1px solid #ffeeba;padding:12px;margin:10px 0;border-radius:6px;",
-      tags$b("Aviso: "),
-      "Los reportes .docx están deshabilitados porque la app no se está ejecutando en modo pesado ",
-      tags$code("APP_HEAVY=TRUE"),
-      ". Habilítalo e instala ",
-      tags$code("officer, flextable"),
-      " para activar las descargas de reportes."
-    )
+
+      /* --------------------------------------------------------- */
+      /*               ⭐ SIDEBAR: Hover + Active full box         */
+      /* --------------------------------------------------------- */
+
+      /* Item activo con caja completa */
+      .skin-blue .main-sidebar .sidebar .sidebar-menu > li.active > a {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+        border-radius: 4px;
+        margin: 4px 8px;
+      }
+
+      /* Hover con caja completa */
+      .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a:hover {
+        background-color: #3399ff !important;
+        color: #ffffff !important;
+        border-radius: 4px;
+        margin: 4px 8px;
+      }
+
+    "))
   ),
 
   #################################################################
@@ -944,16 +968,6 @@ shinydashboard::tabItem(
     )
 
 
-  ), # /tabItems
-
-  # --- Footer al final del body ---
-  tags$footer(
-    class = "app-footer",
-    tags$span("Muestreo de Auditoría – Herramienta de apoyo al muestreo financiero"),
-    tags$span(
-      style = "float:right;",
-      paste0("© ", format(Sys.Date(), '%Y'), " Contraloría General de la República")
-    )
   )
 
 )   # /dashboardBody
