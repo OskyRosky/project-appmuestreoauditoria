@@ -10,8 +10,8 @@
 
 body <- shinydashboard::dashboardBody(
 
- # --- Tema oscuro + estilos de footer + estilos del sidebar (hover + active) ---
- tags$head(
+  # --- Tema oscuro + estilos de footer + estilos del sidebar (hover + active) ---
+  tags$head(
 
     # JS para el modo oscuro
     tags$script(HTML("
@@ -50,7 +50,6 @@ body <- shinydashboard::dashboardBody(
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a {
         color: #e5e7eb !important;  /* letra gris clara */
       }
-
 
 
       /* --------------------------------------------------------- */
@@ -92,7 +91,6 @@ body <- shinydashboard::dashboardBody(
       }
 
 
-
       /* --------------------------------------------------------- */
       /*                          🦶 FOOTER                        */
       /* --------------------------------------------------------- */
@@ -123,14 +121,13 @@ body <- shinydashboard::dashboardBody(
       }
 
 
-
       /* --------------------------------------------------------- */
       /*               ⭐ SIDEBAR: Hover + Active full box         */
       /* --------------------------------------------------------- */
 
       /* Item activo con caja completa */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li.active > a {
-        background-color: ##0c4a6e !important;
+        background-color: #0c4a6e !important;
         color: #ffffff !important;
         border-radius: 4px;
         margin: 4px 8px;
@@ -138,14 +135,14 @@ body <- shinydashboard::dashboardBody(
 
       /* Hover con caja completa */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a:hover {
-        background-color: ##0c4a6e !important;
+        background-color: #0c4a6e !important;
         color: #ffffff !important;
         border-radius: 4px;
         margin: 4px 8px;
       }
 
     "))
-),
+  ),
 
   #################################################################
   #                       CONTENEDOR DE TABS                      #
