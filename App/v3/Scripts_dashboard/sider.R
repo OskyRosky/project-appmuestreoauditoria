@@ -41,42 +41,44 @@ safe_icon <- function(name, fallback = "table") {
 sidebar <- shinydashboard::dashboardSidebar(
   shinydashboard::sidebarMenu(
     shinydashboard::menuItem(
-      text = "Presentación",
+      text    = "Presentación",
       tabName = "p1",
-      icon = safe_icon("chalkboard")
+      icon    = safe_icon("chalkboard")
     ),
     shinydashboard::menuItem(
-      text = "Descriptivo",
+      text    = "Descriptivo",
       tabName = "p2",
-      icon = safe_icon("chart-bar")
+      icon    = safe_icon("chart-bar")
     ),
     shinydashboard::menuItem(
-      text = "Muestra MUM",
+      text    = "Muestra MUM",
       tabName = "p3",
-      icon = safe_icon("list-ol")
+      icon    = safe_icon("list-ol")
     ),
     shinydashboard::menuItem(
-      text = "Muestra LES",
+      text    = "Muestra LES",
       tabName = "p4",
-      icon = safe_icon("filter")
+      icon    = safe_icon("filter")
     ),
     shinydashboard::menuItem(
-      text = "Muestra Atributos",
+      text    = "Muestra Atributos",
       tabName = "p5",
-      icon = safe_icon("tags")
+      icon    = safe_icon("tags")
     ),
     shinydashboard::menuItem(
-      text = "Evaluación",
+      text    = "Evaluación",
       tabName = "p6",
-      icon = safe_icon("ruler")
+      icon    = safe_icon("ruler")
+    ),
+
+    # ---- NUEVA SECCIÓN: FAQs --------------------------------
+    shinydashboard::menuItem(
+      text    = "FAQs",
+      tabName = "faq",
+      icon    = safe_icon("question-circle")
     )
   )
 )
 
-# =============================================================
-# (3) Alias opcional (compatibilidad)
-# -------------------------------------------------------------
-# Si otros scripts hacen referencia a `sider` en lugar de
-# `sidebar`, podemos mantener este alias para compatibilidad.
-# =============================================================
+# (3) Alias opcional (compatibilidad) -------------------------
 sider <- sidebar
