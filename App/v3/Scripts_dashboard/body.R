@@ -14,7 +14,7 @@ body <- shinydashboard::dashboardBody(
   tags$head(
 
     # JS para el modo oscuro
-    tags$script(HTML("
+tags$script(HTML("
       Shiny.addCustomMessageHandler('toggle-dark-mode', function(message) {
         if (message.active) {
           document.body.classList.add('dark-mode');
@@ -24,8 +24,8 @@ body <- shinydashboard::dashboardBody(
       });
     ")),
 
-    # 🟦 CSS - Dark Mode + Footer + Sidebar mejorado + Header/Sidebar custom
-    tags$style(HTML("
+# 🟦 CSS - Dark Mode + Footer + Sidebar mejorado + Header/Sidebar custom
+tags$style(HTML("
 
       /* --------------------------------------------------------- */
       /*                      🌞 MODO CLARO: COLORES               */
@@ -43,12 +43,12 @@ body <- shinydashboard::dashboardBody(
       /* Sidebar (barra izquierda) */
       .skin-blue .main-sidebar,
       .skin-blue .left-side {
-        background-color: #111827 !important;  /* ⚫ gris oscuro tipo Tailwind slate-900 */
+        background-color: #111827 !important;  /* ⚫ gris oscuro */
       }
 
       /* Texto de los items del sidebar */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a {
-        color: #e5e7eb !important;  /* letra gris clara */
+        color: #e5e7eb !important;
       }
 
 
@@ -125,7 +125,6 @@ body <- shinydashboard::dashboardBody(
       /*               ⭐ SIDEBAR: Hover + Active full box         */
       /* --------------------------------------------------------- */
 
-      /* Item activo con caja completa */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li.active > a {
         background-color: #0c4a6e !important;
         color: #ffffff !important;
@@ -133,7 +132,6 @@ body <- shinydashboard::dashboardBody(
         margin: 4px 8px;
       }
 
-      /* Hover con caja completa */
       .skin-blue .main-sidebar .sidebar .sidebar-menu > li > a:hover {
         background-color: #0c4a6e !important;
         color: #ffffff !important;
@@ -141,7 +139,42 @@ body <- shinydashboard::dashboardBody(
         margin: 4px 8px;
       }
 
-    "))
+")),
+
+# 🔥 BLOQUE NUEVO PARA SIDEBAR “MINI” (solo íconos cuando se colapsa)
+tags$style(HTML("
+
+      /* Sidebar colapsado en modo MINI (tipo ShinyLEGO) */
+
+      .sidebar-collapse .main-sidebar {
+        transform: none !important;
+        width: 60px !important;
+      }
+
+      .sidebar-collapse .left-side {
+        width: 60px !important;
+      }
+
+      /* Mantener margen del contenido */
+      .sidebar-collapse .content-wrapper,
+      .sidebar-collapse .main-footer {
+        margin-left: 60px !important;
+      }
+
+      /* Ocultar texto, dejar solo iconos */
+      .sidebar-collapse .sidebar-menu > li > a > span {
+        display: none !important;
+      }
+
+      .sidebar-collapse .sidebar-menu > li > a {
+        text-align: center !important;
+      }
+
+      .sidebar-collapse .sidebar-menu > li > a > .fa {
+        margin-right: 0 !important;
+      }
+
+"))
   ),
 
   #################################################################
