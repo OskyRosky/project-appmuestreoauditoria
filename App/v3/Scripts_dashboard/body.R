@@ -189,7 +189,7 @@ tags$style(HTML("
     shinydashboard::tabItem(
       tabName = "p1",
 
-      h1("Guía de usuario para la aplicación de análisis de muestras en unidades monetarias.", align = "center"),
+      h1("Aplicación en la obtención de muestras en la Auditoría.", align = "center"),
       br(),
 
       # --- Introducción ---

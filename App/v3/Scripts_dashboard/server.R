@@ -160,23 +160,129 @@ server <- function(input, output, session) {
  # ============================================================
   #  🟢 Welcome Guide  (abre un modal con instrucciones básicas)
   # ============================================================
-  observeEvent(input$welcome_guide, {
-    showModal(
-      modalDialog(
-        title = "Guía rápida de la aplicación",
-        size = "l",
-        easyClose = TRUE,
-        footer = modalButton("Cerrar"),
-        tags$ol(
-          tags$li("Use la pestaña 'Descriptivo' para cargar los datos y revisar las estadísticas básicas."),
-          tags$li("En 'Muestra MUM' y 'Muestra LES' configure los parámetros de muestreo y genere las muestras."),
-          tags$li("En 'Muestra Atributos' trabaje con poblaciones categóricas o de cumplimiento."),
-          tags$li("En 'Evaluación' consolide resultados, errores proyectados y conclusiones."),
-          tags$li("En cada módulo puede descargar reportes en .xlsx o .docx para adjuntarlos al expediente.")
+  # ============================================================
+#  🟢 Welcome Guide  (abre un modal con la guía completa)
+# ============================================================
+observeEvent(input$welcome_guide, {
+  showModal(
+    modalDialog(
+      title = "Guía general de la aplicación",
+      size = "l",
+      easyClose = TRUE,
+      footer = modalButton("Cerrar"),
+      tags$div(
+        style = "max-height:60vh; overflow-y:auto; font-size:13px;",
+
+        # ----- Introducción -----
+        tags$h4("Introducción"),
+        tags$p(
+          "Bienvenidos(as) a la aplicación especializada en el análisis de muestras para unidades monetarias."
+        ),
+        tags$p(
+          "Esta herramienta interactiva ha sido diseñada para facilitar el proceso de descripción, muestreo y evaluación de una muestra de unidades monetarias."
+        ),
+
+        # ----- Cómo iniciar -----
+        tags$h4("¡Inicie utilizando la aplicación!"),
+        tags$p("Para comenzar, en cada sección de la barra lateral izquierda deberá:"),
+        tags$ul(
+          tags$li(tags$strong("Navegar:"), " utilice las pestañas del menú lateral para moverse entre los módulos."),
+          tags$li(tags$strong("Cargar datos:"), " use el botón gris de ", tags$em("Cargar datos"),
+                  " en cada módulo para subir su archivo."),
+          tags$li(tags$strong("Analizar:"), " siga las instrucciones específicas en cada sección para realizar el análisis requerido.")
+        ),
+
+        # ----- Estructura de la aplicación -----
+        tags$h4("Estructura de la aplicación"),
+        tags$p(
+          "La aplicación se divide en módulos, cada uno enfocado en un aspecto crítico del muestreo en unidades monetarias:"
+        ),
+        tags$ul(
+          tags$li("Análisis descriptivo"),
+          tags$li("Proceso de muestreo (MUM y LES)"),
+          tags$li("Muestreo por atributos"),
+          tags$li("Evaluación de la muestra")
+        ),
+        tags$p("A continuación se describe brevemente cada módulo."),
+
+        # ----- Análisis descriptivo -----
+        tags$h4("Análisis descriptivo"),
+        tags$p(
+          "Antes de abordar el proceso de muestreo, es esencial comprender el conjunto de datos con el que se trabajará."
+        ),
+        tags$ul(
+          tags$li("Analizar las principales estadísticas descriptivas de la variable de interés."),
+          tags$li("Examinar la distribución de la variable de interés."),
+          tags$li("Evaluar el posible ajuste de funciones de distribución.")
+        ),
+
+        # ----- Proceso de muestreo (MUM y LES) -----
+        tags$h4("Proceso de muestreo (MUM y LES)"),
+        tags$p(
+          "Tras entender los datos, se procede con la etapa de muestreo:"
+        ),
+        tags$ul(
+          tags$li("Determinar el tamaño de muestra."),
+          tags$li("Visualizar la selección de casos según el tamaño de muestra."),
+          tags$li("Comparar las distribuciones entre los datos originales y los obtenidos por la muestra."),
+          tags$li("Descargar los datos seleccionados en el proceso de muestreo.")
+        ),
+
+        # ----- Muestreo por atributos -----
+        tags$h4("Muestreo por atributos"),
+        tags$p(
+          "En este módulo se trabaja con variables categóricas o de cumplimiento."
+        ),
+        tags$ul(
+          tags$li("Determinar el tamaño de muestra para variables de atributo."),
+          tags$li("Visualizar la selección de casos según el tamaño de muestra."),
+          tags$li("Comparar porcentajes de categorías entre datos originales y muestra."),
+          tags$li("Descargar los datos seleccionados en el proceso de muestreo.")
+        ),
+
+        # ----- Evaluación de la muestra -----
+        tags$h4("Evaluación de la muestra"),
+        tags$p(
+          "El último módulo permite contrastar empíricamente la muestra auditada con los valores originales."
+        ),
+        tags$ul(
+          tags$li("Describir y comparar resultados entre valores observados y auditados."),
+          tags$li("Presentar indicadores de riesgo según las diferencias encontradas."),
+          tags$li("Definir criterios o umbrales máximos tolerables en la evaluación de la muestra.")
+        ),
+
+        # ----- Reportes -----
+        tags$h4("Reportes de análisis"),
+        tags$p(
+          "Al final de cada sección se presenta un botón de ",
+          tags$strong("'Descargar reporte'"),
+          ", que permite obtener los resultados del análisis en un formato adecuado."
+        ),
+        tags$p(
+          "Cada sección de análisis puede descargarse en formato ",
+          tags$code(".docx"), "."
+        ),
+
+        # ----- Sobre la carga de datos -----
+        tags$h4("Sobre la carga de datos"),
+        tags$p(
+          "Para cada uno de los módulos deberá cargar un archivo de datos. La aplicación admite formatos como ",
+          tags$code(".xlsx"), ", ", tags$code(".txt"), " y ", tags$code(".csv"), "."
+        ),
+        tags$ul(
+          tags$li("Cada archivo debe contener una sola tabla."),
+          tags$li("Los datos deben estar limpios y listos para el análisis."),
+          tags$li("El tamaño máximo recomendado por archivo es de 100 MB.")
         )
+
+        # Aquí más adelante podemos añadir una imagen, por ejemplo:
+        # tags$hr(),
+        # tags$img(src = 'www/intro_banner.png',
+        #          style = 'width:100%; max-height:200px; object-fit:cover; margin-top:10px;')
       )
     )
-  })
+  )
+})
 
   # ============================================================
   #  🌗 Modo oscuro: envía el estado al frontend (JS)
