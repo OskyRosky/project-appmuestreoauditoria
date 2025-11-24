@@ -30,7 +30,7 @@ tags$li(
     label = tagList(
       icon("info-circle"),
       tags$span(
-        "¡ Bienvenidos !",
+        "¡ Bienvenido !",
         style = "margin-left:6px; font-size:16px; font-weight:600;"
       )
     ),
