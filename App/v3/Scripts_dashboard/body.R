@@ -282,25 +282,8 @@ shinydashboard::tabItem(
     shinydashboard::tabItem(
       tabName = "p3",
 
-      h1("Muestreo", align = "center"),
+      h1("Muestreo MUM.", align = "center"),
       br(),
-
-      h2("En esta sección:", align = "left"),
-      br(),
-      h4("Se lleva a cabo el proceso de muestreo: tamaño y selección de las unidades.", align = "left"),
-      br(),
-      h4("Cargando los datos, usted podrá:"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Calcular el tamaño de muestra.", align = "left")),
-        tags$li(h4("Visualizar las unidades seleccionadas.", align = "left")),
-        tags$li(h4("Comparar los datos cargados vs los datos de la muestra.", align = "left")),
-        tags$li(h4("Descargar la muestra en .csv, .txt o .xlsx.", align = "left")),
-        tags$li(h4("Descargar los resultados en '.docx'.", align = "left"))
-      ),
-      br(),
-
       # --- Carga de datos ---
       h3("Cargar datos", align = "left"),
       br(),
