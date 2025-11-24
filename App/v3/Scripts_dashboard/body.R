@@ -10,11 +10,11 @@
 
 body <- shinydashboard::dashboardBody(
 
-# --- Tema oscuro + estilos de footer + estilos del sidebar (hover + active) ---
-tags$head(
+  # --- Tema oscuro + estilos de footer + estilos del sidebar (hover + active) ---
+  tags$head(
 
-  # JS para el modo oscuro
-  tags$script(HTML("
+    # JS para el modo oscuro
+tags$script(HTML("
       Shiny.addCustomMessageHandler('toggle-dark-mode', function(message) {
         if (message.active) {
           document.body.classList.add('dark-mode');
@@ -22,10 +22,10 @@ tags$head(
           document.body.classList.remove('dark-mode');
         }
       });
-  ")),
+    ")),
 
-  # 🟦 CSS - Dark Mode + Footer + Sidebar mejorado + Header/Sidebar custom
-  tags$style(HTML("
+# 🟦 CSS - Dark Mode + Footer + Sidebar mejorado + Header/Sidebar custom
+tags$style(HTML("
 
       /* --------------------------------------------------------- */
       /*                      🌞 MODO CLARO: COLORES               */
@@ -86,7 +86,7 @@ tags$head(
 
       body.dark-mode .box-header,
       body.dark-mode .box-title,
-      body-dark-mode .box-body {
+      body.dark-mode .box-body {
         color: #e5e7eb;
       }
 
@@ -139,31 +139,10 @@ tags$head(
         margin: 4px 8px;
       }
 
-      /* --------------------------------------------------------- */
-      /*      🔵 ÍCONOS DEL HEADER: TAMAÑO Y POSICIONAMIENTO       */
-      /* --------------------------------------------------------- */
+")),
 
-      /* Tamaño de los íconos del header */
-      .header-icon {
-        font-size: 20px !important;
-      }
-
-      /* Mover menús un poco hacia la derecha y darles aire */
-      .skin-blue .main-header .navbar .dropdown.messages-menu > a,
-      .skin-blue .main-header .navbar .dropdown.notifications-menu > a {
-        padding-right: 25px !important;
-        margin-right: 10px !important;
-      }
-
-      /* Opcional: separar un poco más el switch del borde derecho */
-      .skin-blue .main-header .navbar .dropdown:last-child {
-        margin-right: 20px !important;
-      }
-
-  ")),
-
-  # 🔥 BLOQUE NUEVO PARA SIDEBAR “MINI” (solo íconos cuando se colapsa)
-  tags$style(HTML("
+# 🔥 BLOQUE NUEVO PARA SIDEBAR “MINI” (solo íconos cuando se colapsa)
+tags$style(HTML("
 
       /* Sidebar colapsado en modo MINI (tipo ShinyLEGO) */
 
@@ -195,8 +174,8 @@ tags$head(
         margin-right: 0 !important;
       }
 
-  "))
-),
+"))
+  ),
 
   #################################################################
   #                       CONTENEDOR DE TABS                      #
