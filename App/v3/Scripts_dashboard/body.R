@@ -189,6 +189,8 @@ tags$style(HTML("
     
 shinydashboard::tabItem(
   tabName = "p1",
+  br(),
+  br(),
   tags$div(
     style = "text-align:center; padding-top:10px;",
     tags$img(
