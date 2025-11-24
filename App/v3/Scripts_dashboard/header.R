@@ -24,13 +24,13 @@ app_header <- shinydashboard::dashboardHeader(
              transform: translateX(-50%);
              top:6px;
              z-index:999;",
-    uiOutput("header_help_button")   # 👈 solo esto, sin actionButton adicional
+    uiOutput("header_help_button")
   ),
 
   # --- ÍCONO DE CHAT (feedback) ---
   shinydashboard::dropdownMenu(
     type = "messages",
-    icon = icon("comment"),
+    icon = icon("comment", class = "header-icon"),   # 👈 clase nueva
     badgeStatus = NULL,
     shinydashboard::messageItem(
       from = "Comentarios y sugerencias",
@@ -43,7 +43,7 @@ app_header <- shinydashboard::dashboardHeader(
   # --- ÍCONO DE COMPARTIR ---
   shinydashboard::dropdownMenu(
     type = "notifications",
-    icon = icon("share-alt"),
+    icon = icon("share-alt", class = "header-icon"), # 👈 misma clase
     badgeStatus = NULL,
     shinydashboard::notificationItem(
       text = "Twitter",
@@ -65,7 +65,7 @@ app_header <- shinydashboard::dashboardHeader(
   # --- Switch Day/Night ---
   tags$li(
     class = "dropdown",
-    style = "padding: 12px 20px 0 20px; margin-left:auto;",
+    style = "padding: 10px 26px 0 18px; margin-left:auto;",
     shinyWidgets::materialSwitch(
       inputId = "dark_mode",
       label  = NULL,
