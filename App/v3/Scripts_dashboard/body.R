@@ -212,24 +212,7 @@ shinydashboard::tabItem(
 
       h1("Análisis Descriptivos", align = "center"),
       br(),
-
-      h2("En esta sección:", align = "left"),
-      br(),
-      h4("Se analiza de forma descriptiva el conjunto de datos.", align = "left"),
-      br(),
-      h4("Cargando los datos, usted podrá:"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Conocer las principales estadísticas descriptivas de la variable seleccionada.", align = "left")),
-        tags$li(h4("Visualizar la distribución de la variable seleccionada (densidad).", align = "left")),
-        tags$li(h4("Comparar la distribución con Poisson o Binomial.", align = "left")),
-        tags$li(h4("Descargar los resultados en formato '.docx'.", align = "left"))
-      ),
-      br(),
-      h4("Esto guiará la selección de distribución para el tamaño de muestra en la sección siguiente."),
-      br(),
-
+       
       # --- Carga de datos ---
       h3("Cargar datos", align = "left"),
       fileInput(

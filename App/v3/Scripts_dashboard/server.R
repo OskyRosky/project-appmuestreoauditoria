@@ -316,13 +316,27 @@ observeEvent(input$welcome_guide, {
 
     # ---------- p2 ----------
     p2 = tagList(
-      tags$h4("Módulo Descriptivo"),
-      tags$ul(
-        tags$li("Cargue la población completa."),
-        tags$li("Revise estadísticas clave del conjunto de datos."),
-        tags$li("Analice la distribución para elegir el método de muestreo.")
+  tags$h4("Módulo Descriptivo"),
+
+  tags$p(
+    "Este módulo permite analizar de forma inicial la población completa de la variable monetaria seleccionada. ",
+    "Su objetivo es brindar una comprensión clara del comportamiento de los datos antes de avanzar a las etapas de muestreo."
+  ),
+
+  tags$ul(
+    tags$li("Cargar la población completa correspondiente al universo de auditoría."),
+    tags$li("Explorar estadísticas descriptivas clave: totales, promedios, mediana, desviación estándar y concentración."),
+    tags$li("Visualizar distribuciones de frecuencias e identificar patrones relevantes, como asimetrías o valores atípicos."),
+    tags$li("Comparar ajustes de distribución (Normal, Poisson y Binomial) para apoyar la selección del método de muestreo."),
+    tags$li(
+      tagList(
+        "Generar un reporte en formato ",
+        tags$code(".docx"),
+        " con los resultados descriptivos más relevantes."
       )
-    ),
+    )
+  )
+),
 
     # ---------- p3 ----------
     p3 = tagList(
