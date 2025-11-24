@@ -186,130 +186,13 @@ tags$style(HTML("
     #                           PÁG. p1                             #
     #                        📘 PRESENTACIÓN                        #
     #################################################################
+    
     shinydashboard::tabItem(
       tabName = "p1",
 
-      h1("Aplicación en la obtención de muestras en la Auditoría.", align = "center"),
-      br(),
+      h1("Aplicación en la obtención de muestras en la Auditoría.", align = "center")
 
-      # --- Introducción ---
-      h2("Introducción", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Bienvenidos(as) a la aplicación especializada en el análisis de muestras para unidades monetarias.", align = "left"),
-      br(),
-      h4("Esta herramienta interactiva ha sido diseñada para facilitar el proceso de descripción, de muestreo y de evaluación de una muestra de unidades monetaria.", align = "left"),
-      br(),
 
-      # --- Inicie utilizando la App ---
-      h2("¡Inicie utilizando la App!", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Para comenzar, en cada sección de la barra lateral izquierda, deberá:", align = "left"),
-      br(),
-      h4("Navegar", align = "left", style = "font-weight: bold"),
-      h4("Navegue entre los diferentes módulos utilizando las pestañas dispuestas en la interfaz del usuario."),
-      h4("Cargar Datos", align = "left", style = "font-weight: bold"),
-      h4("Utilice el botón gris en las apartados de Cargar  Datos para trabajar su conjunto de datos.", align = "left"),
-      h4("Analizar", align = "left", style = "font-weight: bold"),
-      h4("Siga las instrucciones específicas en cada sección para realizar el análisis requerido."),
-      br(),
-
-      # --- Estructura de la aplicación ---
-      h2("Estructura de la Aplicación", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("La aplicación se divide en tres módulos, cada uno enfocado en un aspecto crítico del muestreo en unidades monetarias:", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Análisis Descriptivo", align = "left")),
-        tags$li(h4("Proceso de Muestreo",  align = "left")),
-        tags$li(h4("Evaluación de la Muestra", align = "left"))
-      ),
-      br(),
-      h4("A continuación, exploramos en detalle cada uno de estos módulos.", align = "left"),
-      br(),
-
-      # --- Análisis descriptivo (resumen) ---
-      h2("Análisis Descriptivo", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Antes de abordar el proceso de muestreo (tamaño de muestra y selección de las unidades), es esencial comprender el conjunto de datos con el que se trabajará. En el módulo de Análisis Descriptivo, los usuarios podrán:", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Analizar las principales estadísticas descriptivas de la variable de interés.", align = "left")),
-        tags$li(h4("Analizar la distribución de la variable de interés.", align = "left")),
-        tags$li(h4("Según el análisis de la distribución de la variable de interés, tener una mejor perspectiva del ajuste de la función de distribución.", align = "left"))
-      ),
-      br(),
-
-      # --- Proceso de muestreo (resumen) ---
-      h2("Proceso de Muestreo (MUM y LES)", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Tras un entendimiento del conjunto de datos, se procede con la etapa del Muestreo. Esta etapa se conforma por:", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Determinar el tamaño de muestra.", align = "left")),
-        tags$li(h4("Visualizar la selección de los casos (filas) según la determinación del tamaño de muestra.", align = "left")),
-        tags$li(h4("Comparar las distribuciones entre los datos orginales y los obtenidos por la muestra.", align = "left")),
-        tags$li(h4("Descargar los datos seleccionados en el proceso de muestreo (obtenidos por la muestra).", align = "left"))
-      ),
-      br(),
-
-      # --- Muestreo por Atributos (resumen) ---
-      h2("Muestreo por Atributos", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Se explica cómo obtener una muestra a partir de una variable de atributo. Esta etapa se conforma por:", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Determinar el tamaño de muestra.", align = "left")),
-        tags$li(h4("Visualizar la selección de los casos (filas) según la determinación del tamaño de muestra.", align = "left")),
-        tags$li(h4("Comparar los porcentajes de las categorías entre los datos orginales y los obtenidos por la muestra.", align = "left")),
-        tags$li(h4("Descargar los datos seleccionados en el proceso de muestreo (obtenidos por la muestra).", align = "left"))
-      ),
-      br(),
-
-      # --- Evaluación (resumen) ---
-      h2("Evaluación de la Muestra", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("El último módulo es para obtener un contraste empírico referente al proceso de la auditoría de la muestra obtenida con anterioridad.", align = "left"),
-      h4("El foco está en comparar los valores observados (selecionados por la muestra), contra los valores auditados (obtenidos o revisados en el proceso de auditoría).", align = "left"),
-      h4("En esta sección de contraste empírico o comparación de datos:", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Se describen y comparan los resultados de una muestra antes seleccionados a nivel visual y los valores que presentan diferencias.", align = "left")),
-        tags$li(h4("Se presentan indicadores de riesgo según la comparación entre los valores observados y auditados.", align = "left")),
-        tags$li(h4("Se expone la selección de criterios o umbrales máximos tolerables en la evaluación de la muestra.", align = "left"))
-      ),
-
-      # --- Reportes ---
-      h2("Reportes de análisis", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Al final de cada sección se presenta un 'Descargar Reporte', lo cual permite obtener los resultados del análisis en un formato más adecuado.", align = "left"),
-      h4("Cada una de las secciones de análisis puede ser descargada en formato .docx.", align = "left"),
-      br(),
-
-      # --- Carga de datos (resumen) ---
-      h2("Sobre la carga de datos", align = "left",
-         style = "font-weight: bold; text-decoration: underline;"),
-      br(),
-      h4("Para cada uno de los módulos anteriores, deberá cargar un archivo de datos. La aplicación admite múltiples formatos incluyendo .xlsx, .txt y .csv. Tenga en cuenta que:", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Cada archivo cargado debe contener una sola tabla.", align = "left", style = "font-weight: bold")),
-        tags$li(h4("Los datos deben estar limpios, listos para ser analizados.", align = "left", style = "font-weight: bold")),
-        tags$li(h4("El peso máximo permitido por archivo es de 100 megabytes, asegurando así la fluidez y eficiencia de la aplicación.", align = "left", style = "font-weight: bold"))
-      )
     ),
 
     #################################################################
