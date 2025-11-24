@@ -40,8 +40,20 @@ cat("📂 Scripts dir: ", scripts_dir, "\n", sep = "")
   cat("✅ Cargado: ", fname, "\n", sep = "")
 }
 
-# 1) Dependencias (instala/carga). Mantén tu lógica dentro de este archivo.
+# 1) Dependencias (aquí se carga {shiny})
 .cargar("Librerias.R")
+
+# ============================================================
+#  🎨 Registrar carpeta /www/ima para imágenes estáticas
+# ============================================================
+www_ima_dir <- file.path(script_dir, "www", "ima")
+if (dir.exists(www_ima_dir)) {
+  shiny::addResourcePath("ima", www_ima_dir)
+  cat("🖼️ Recursos estáticos servidos desde: ", www_ima_dir, "\n", sep = "")
+} else {
+  cat("⚠️ Advertencia: no se encontró carpeta www/ima en:\n  ",
+      www_ima_dir, "\n", sep = "")
+}
 
 # 2) Parámetros (si existe)
 if (file.exists(file.path(scripts_dir, "Parametros.R"))) .cargar("Parametros.R")
