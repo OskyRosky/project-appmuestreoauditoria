@@ -340,13 +340,37 @@ observeEvent(input$welcome_guide, {
 
     # ---------- p3 ----------
     p3 = tagList(
-      tags$h4("Módulo Muestra MUM"),
-      tags$ul(
-        tags$li("Configure riesgo, materialidad y error mínimo."),
-        tags$li("Genere el tamaño de muestra por MUM."),
-        tags$li("Descargue la muestra seleccionada.")
+  tags$h4("Módulo Muestra MUM"),
+
+  tags$p(
+    "En este módulo se realiza el muestreo por unidades monetarias (MUM), ",
+    "diseñado para trabajar con datos que representan montos o importes. ",
+    "Su objetivo es seleccionar una muestra monetaria representativa de la población bajo auditoría."
+  ),
+
+  tags$ul(
+    tags$li("Cargar la base de datos con los montos que conforman la población a auditar."),
+    tags$li("Calcular el tamaño de muestra en función de los parámetros definidos (riesgo, materialidad, etc.)."),
+    tags$li("Visualizar las unidades monetarias seleccionadas como parte de la muestra."),
+    tags$li("Comparar la estructura de la población original frente a la muestra seleccionada (distribución y concentración de montos)."),
+    tags$li(
+      tagList(
+        "Descargar la muestra seleccionada en formatos ",
+        tags$code(".csv"), ", ",
+        tags$code(".txt"), " o ",
+        tags$code(".xlsx"),
+        " para su uso en el trabajo de auditoría."
       )
     ),
+    tags$li(
+      tagList(
+        "Generar y descargar un informe en formato ",
+        tags$code(".docx"),
+        " con los resultados y conclusiones más relevantes de esta sección, listo para incorporarse a los papeles de trabajo."
+      )
+    )
+  )
+),
 
     # ---------- p4 ----------
     p4 = tagList(
