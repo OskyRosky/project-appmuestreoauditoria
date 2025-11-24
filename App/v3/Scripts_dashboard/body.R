@@ -190,7 +190,10 @@ tags$style(HTML("
     shinydashboard::tabItem(
       tabName = "p1",
 
-      h1("Aplicación en la obtención de muestras en la Auditoría.", align = "center")
+      h1("Aplicación de muestreo en Auditoría.", align = "center"),
+      br(),
+      br(),
+      br()
 
 
     ),
