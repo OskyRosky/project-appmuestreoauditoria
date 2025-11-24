@@ -18,10 +18,6 @@
 # =============================================================
 # (1) Función auxiliar: íconos seguros
 # -------------------------------------------------------------
-# Algunos nombres de íconos pueden cambiar entre versiones
-# de Font Awesome. Esta función evita errores si un ícono
-# específico no existe en la versión actual del sistema.
-# =============================================================
 safe_icon <- function(name, fallback = "table") {
   tryCatch(icon(name), error = function(...) icon(fallback))
 }
@@ -29,17 +25,10 @@ safe_icon <- function(name, fallback = "table") {
 # =============================================================
 # (2) Definición del sidebar
 # -------------------------------------------------------------
-# dashboardSidebar() crea la barra lateral y sidebarMenu()
-# organiza los elementos (menuItem) que permiten navegar
-# entre pestañas del dashboard.
-#
-# Cada `menuItem()` contiene:
-#   - label visible del menú
-#   - tabName (debe coincidir con la sección del body)
-#   - icono representativo
-# =============================================================
 sidebar <- shinydashboard::dashboardSidebar(
   shinydashboard::sidebarMenu(
+    id = "sidebar",     # 👈 ***NUEVO: necesario para botón dinámico***
+
     shinydashboard::menuItem(
       text    = "Presentación",
       tabName = "p1",

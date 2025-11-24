@@ -4,7 +4,7 @@
 
 app_header <- shinydashboard::dashboardHeader(
   titleWidth = 260,
-  
+
   # --- Título (icono + texto) ---
   title = tagList(
     tags$span(
@@ -15,33 +15,19 @@ app_header <- shinydashboard::dashboardHeader(
       )
     )
   ),
-  
-  # --- Boton de Bienvenido (centrado visualmente y más grande) ---
-tags$li(
-  class = "dropdown",
-  style = "position:absolute;
-            left:50%;
-            transform: translateX(-50%);
-            top:6px;
-            z-index:999;",
-  actionButton(
-    inputId = "welcome_guide",
-    label = tagList(
-      icon("info-circle"),
-      tags$span(
-        "¡ Bienvenido !",
-        style = "margin-left:6px; font-size:16px; font-weight:600;"
-      )
-    ),
-    class = "btn btn-success",
-    style = "padding:10px 28px;
-             font-size:16px;
-             border-radius:8px;
-    "
-  )
-),
-  
-  # --- ÍCONO DE CHAT (feedback por correo) -------------------
+
+  # --- Botón dinámico centrado ---
+  tags$li(
+    class = "dropdown",
+    style = "position:absolute;
+             left:50%;
+             transform: translateX(-50%);
+             top:6px;
+             z-index:999;",
+    uiOutput("header_help_button")   # 👈 solo esto, sin actionButton adicional
+  ),
+
+  # --- ÍCONO DE CHAT (feedback) ---
   shinydashboard::dropdownMenu(
     type = "messages",
     icon = icon("comment"),
@@ -53,8 +39,8 @@ tags$li(
       href   = "mailto:muestreo_auditoria@cgr.go.cr"
     )
   ),
-  
-  # --- ÍCONO DE COMPARTIR (redes sociales) -------------------
+
+  # --- ÍCONO DE COMPARTIR ---
   shinydashboard::dropdownMenu(
     type = "notifications",
     icon = icon("share-alt"),
@@ -75,8 +61,8 @@ tags$li(
       href = "https://plus.google.com/share?url=#"
     )
   ),
-  
-  # --- Switch Day / Night (EXTREMO DERECHO) ------------------
+
+  # --- Switch Day/Night ---
   tags$li(
     class = "dropdown",
     style = "padding: 12px 20px 0 20px; margin-left:auto;",
