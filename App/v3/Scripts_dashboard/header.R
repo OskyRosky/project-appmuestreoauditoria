@@ -16,19 +16,32 @@ app_header <- shinydashboard::dashboardHeader(
     )
   ),
   
-  # --- Welcome Guide (posicionado cerca de la izquierda) ---
-  tags$li(
-    class = "dropdown",
-    style = "position:absolute; left:270px; top:4px; padding:0 10px;",
-    actionButton(
-      inputId = "welcome_guide",
-      label = tagList(
-        icon("info-circle"),
-        tags$span("¡ Bienvenidos !", style = "margin-left:4px;")
-      ),
-      class = "btn btn-success btn-sm"
-    )
-  ),
+  # --- Boton de Bienvenido (centrado visualmente y más grande) ---
+tags$li(
+  class = "dropdown",
+  style = "
+    position:absolute;
+    left:50%;
+    transform: translateX(-50%);
+    top:6px;
+  ",
+  actionButton(
+    inputId = "welcome_guide",
+    label = tagList(
+      icon("info-circle"),
+      tags$span(
+        "¡ Bienvenidos !",
+        style = "margin-left:6px; font-size:16px; font-weight:600;"
+      )
+    ),
+    class = "btn btn-success",
+    style = "
+      padding:10px 28px;
+      font-size:16px;
+      border-radius:8px;
+    "
+  )
+),
   
   # --- ÍCONO DE CHAT (feedback por correo) -------------------
   shinydashboard::dropdownMenu(
