@@ -194,7 +194,7 @@ output$header_help_button <- renderUI({
 
 # ============================================================
 # 🟢 Modal de ayuda dependiendo del módulo actual
-#     - p1  → guía COMPLETA (la original)
+#     - p1  → guía COMPLETA (tu versión original, intacta)
 #     - p2+ → guías resumidas por módulo
 # ============================================================
 observeEvent(input$welcome_guide, {
@@ -204,7 +204,7 @@ observeEvent(input$welcome_guide, {
 
 
   # ------------------------------------------------------------
-  # 1) SI ESTÁS EN p1 → MOSTRAR LA GUÍA COMPLETA (TU ORIGINAL)
+  # 1) SI ESTÁS EN p1 → MOSTRAR LA GUÍA COMPLETA ORIGINAL
   # ------------------------------------------------------------
   if (current_tab == "p1") {
 
@@ -214,6 +214,7 @@ observeEvent(input$welcome_guide, {
         size = "l",
         easyClose = TRUE,
         footer = modalButton("Cerrar"),
+
         tags$div(
           style = "max-height:60vh; overflow-y:auto; font-size:13px;",
 
@@ -231,33 +232,35 @@ observeEvent(input$welcome_guide, {
             tags$li(tags$strong("Analizar:"), " siga las instrucciones específicas en cada sección para realizar el análisis requerido.")
           ),
 
-          # ----- Estructura -----
+          # ----- Estructura de la aplicación -----
           tags$h4("Estructura de la aplicación"),
+          tags$p("La aplicación se divide en módulos, cada uno enfocado en un aspecto crítico del muestreo en unidades monetarias:"),
           tags$ul(
             tags$li("Análisis descriptivo"),
             tags$li("Proceso de muestreo (MUM y LES)"),
             tags$li("Muestreo por atributos"),
             tags$li("Evaluación de la muestra")
           ),
+          tags$p("A continuación se describe brevemente cada módulo."),
 
           # ----- Análisis descriptivo -----
           tags$h4("Análisis descriptivo"),
           tags$ul(
-            tags$li("Analizar las principales estadísticas descriptivas."),
+            tags$li("Analizar las principales estadísticas descriptivas de la variable de interés."),
             tags$li("Examinar la distribución de la variable de interés."),
             tags$li("Evaluar posibles ajustes de funciones de distribución.")
           ),
 
-          # ----- MUM y LES -----
+          # ----- Proceso de muestreo (MUM y LES) -----
           tags$h4("Proceso de muestreo (MUM y LES)"),
           tags$ul(
             tags$li("Determinar el tamaño de muestra."),
-            tags$li("Visualizar la selección de casos."),
+            tags$li("Visualizar la selección de casos según el tamaño de muestra."),
             tags$li("Comparar distribuciones entre datos originales y muestra."),
             tags$li("Descargar los datos de la muestra.")
           ),
 
-          # ----- Atributos -----
+          # ----- Muestreo por atributos -----
           tags$h4("Muestreo por atributos"),
           tags$ul(
             tags$li("Determinar el tamaño de muestra para variables categóricas."),
@@ -266,37 +269,37 @@ observeEvent(input$welcome_guide, {
             tags$li("Descargar los datos seleccionados.")
           ),
 
-          # ----- Evaluación -----
+          # ----- Evaluación de la muestra -----
           tags$h4("Evaluación de la muestra"),
           tags$ul(
             tags$li("Comparar valores observados vs auditados."),
             tags$li("Presentar indicadores de riesgo."),
-            tags$li("Definir criterios o umbrales tolerables.")
+            tags$li("Definir criterios/umbrales tolerables.")
           ),
 
           # ----- Reportes -----
           tags$h4("Reportes de análisis"),
           tags$p("Cada módulo contiene un botón de 'Descargar reporte' en formato .docx."),
 
-          # ----- Sobre carga -----
+          # ----- Sobre carga de datos -----
           tags$h4("Sobre la carga de datos"),
           tags$ul(
             tags$li("Formatos permitidos: .xlsx, .csv, .txt"),
-            tags$li("Cada archivo debe contener una sola tabla."),
-            tags$li("Máximo recomendado por archivo: 100 MB.")
+            tags$li("Una sola tabla por archivo."),
+            tags$li("Máximo recomendado: 100 MB.")
           )
         )
       )
     )
 
-    return()   # 👈😊 No seguir evaluando las demás opciones
+    return()   # 👈 PARA QUE NO AVANCE A LOS OTROS MÓDULOS
   }
+
 
 
   # ------------------------------------------------------------
   # 2) SI NO ES p1 → GUÍAS CORTAS SEGÚN LA SECCIÓN
   # ------------------------------------------------------------
-
   modal_title <- switch(
     current_tab,
     p2  = "Guía del módulo Descriptivo",
@@ -337,7 +340,7 @@ observeEvent(input$welcome_guide, {
       tags$ul(
         tags$li("Configure parámetros del método LES."),
         tags$li("Genere el tamaño y composición de la muestra."),
-        tags$li("Compare distribución de población vs muestra.")
+        tags$li("Compare distribución población vs muestra.")
       )
     ),
 
@@ -371,7 +374,7 @@ observeEvent(input$welcome_guide, {
       )
     ),
 
-    # ---------- default ----------
+    # ---------- Default ----------
     tagList(tags$p("Guía rápida del módulo actual."))
   )
 
@@ -386,6 +389,8 @@ observeEvent(input$welcome_guide, {
   )
 
 })
+
+
   # ============================================================
   #  🌗 Modo oscuro: envía el estado al frontend (JS)
   # ============================================================
