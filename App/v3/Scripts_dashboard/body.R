@@ -188,15 +188,32 @@ tags$style(HTML("
     #################################################################
     
     shinydashboard::tabItem(
-      tabName = "p1",
-
-      h1("Aplicación de muestreo en Auditoría.", align = "center"),
-      br(),
-      br(),
-      br()
-
-
-    ),
+  tabName = "p1",
+  fluidRow(
+    box(
+      width = 12,
+      title = "Presentación",
+      status = "primary",
+      solidHeader = TRUE,
+      tags$div(
+        style = "text-align:center; padding:10px 0;",
+        tags$img(
+          src = "muestreo_auditoria.png",   # 👈 ruta relativa dentro de www
+          style = "max-width:100%; height:auto; max-height:420px; border-radius:8px;"
+        )
+      )
+    )
+  )
+  # si quieres, debajo puedes dejar un texto breve:
+  # ,fluidRow(
+  #   box(
+  #     width = 12,
+  #     status = "info",
+  #     solidHeader = FALSE,
+  #     p("Esta aplicación apoya el proceso de muestreo en auditoría, desde el análisis descriptivo hasta la evaluación de la muestra.")
+  #   )
+  # )
+),
 
     #################################################################
     #                           PÁG. p2                             #
