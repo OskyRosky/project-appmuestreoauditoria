@@ -19,12 +19,11 @@ app_header <- shinydashboard::dashboardHeader(
   # --- Boton de Bienvenido (centrado visualmente y más grande) ---
 tags$li(
   class = "dropdown",
-  style = "
-    position:absolute;
-    left:50%;
-    transform: translateX(-50%);
-    top:6px;
-  ",
+  style = "position:absolute;
+            left:50%;
+            transform: translateX(-50%);
+            top:6px;
+            z-index:999;",
   actionButton(
     inputId = "welcome_guide",
     label = tagList(
@@ -35,10 +34,9 @@ tags$li(
       )
     ),
     class = "btn btn-success",
-    style = "
-      padding:10px 28px;
-      font-size:16px;
-      border-radius:8px;
+    style = "padding:10px 28px;
+             font-size:16px;
+             border-radius:8px;
     "
   )
 ),
