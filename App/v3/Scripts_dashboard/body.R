@@ -539,22 +539,7 @@ shinydashboard::tabItem(
     shinydashboard::tabItem(
       tabName = "p5",
 
-      h1("Muestreo por atributos.", align = "center"),
-      br(),
-
-      h2("Se lleva a cabo el proceso de muestreo por atributos: tamaño y selección de las unidades.", align = "left"),
-      br(),
-      h4("Una vez cargada la información y seleccionadas las variables de atributo, usted podrá:"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Determinar niveles de error tolerable, esperado y nivel de confianza.", align = "left")),
-        tags$li(h4("Determinar el tamaño de muestra.", align = "left")),
-        tags$li(h4("Visualizar la muestra seleccionada.", align = "left")),
-        tags$li(h4("Comparar porcentajes de categorías para originales vs muestra.", align = "left")),
-        tags$li(h4("Descargar la muestra seleccionada.", align = "left")),
-        tags$li(h4("Descargar los resultados en '.docx'.", align = "left"))
-      ),
+      h1("Muestreo para atributos.", align = "center"),
       br(),
 
       # --- Carga de datos ---

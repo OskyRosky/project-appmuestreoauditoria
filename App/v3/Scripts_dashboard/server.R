@@ -422,13 +422,59 @@ observeEvent(input$welcome_guide, {
 
     # ---------- p5 ----------
     p5 = tagList(
-      tags$h4("Muestra por Atributos"),
-      tags$ul(
-        tags$li("Use este módulo para variables categóricas."),
-        tags$li("Calcule tamaño de muestra según proporción esperada."),
-        tags$li("Compare porcentajes entre población y muestra.")
+  tags$h4("Módulo Muestra por Atributos"),
+
+  tags$p(
+    "Este módulo está diseñado para aplicar ",
+    tags$strong("muestreo por atributos"),
+    ", enfocado en variables cualitativas o categóricas ",
+    "(por ejemplo: cumple / no cumple, sí / no, conforme / no conforme)."
+  ),
+
+  tags$p(
+    "El objetivo es estimar proporciones poblacionales a partir de una muestra, ",
+    "evaluando si la tasa de error observada se mantiene dentro de los niveles ",
+    "tolerables definidos por el auditor."
+  ),
+
+  tags$ul(
+    tags$li(
+      "Cargar la población completa de la variable categórica o de cumplimiento ",
+      "que será objeto de auditoría."
+    ),
+    tags$li(
+      "Calcular el ",
+      tags$strong("tamaño de muestra"),
+      " en función de parámetros como proporción esperada de error, ",
+      "nivel de confianza y error tolerable."
+    ),
+    tags$li(
+      "Visualizar las unidades seleccionadas como parte de la muestra de atributos."
+    ),
+    tags$li(
+      "Comparar las proporciones observadas en la muestra con las proporciones poblacionales, ",
+      "identificando diferencias relevantes entre lo esperado y lo estimado."
+    ),
+    tags$li(
+      tagList(
+        "Descargar la muestra seleccionada en formatos ",
+        tags$code(".csv"), ", ",
+        tags$code(".txt"), " o ",
+        tags$code(".xlsx"),
+        " para su uso en el trabajo de auditoría."
       )
     ),
+    tags$li(
+      tagList(
+        "Generar un informe en formato ",
+        tags$code(".docx"),
+        " con los resultados principales del muestreo por atributos, ",
+        "incluyendo tamaños de muestra, proporciones estimadas y conclusiones clave ",
+        "para los papeles de trabajo."
+      )
+    )
+  )
+),
 
     # ---------- p6 ----------
     p6 = tagList(
