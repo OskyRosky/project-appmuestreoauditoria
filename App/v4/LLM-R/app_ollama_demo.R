@@ -1,6 +1,8 @@
+
 library(shiny)
 library(httr2)
 library(jsonlite)
+library(tinytex)
 library(rmarkdown)
 
 # --- Función para hablar con Ollama ---
@@ -21,102 +23,72 @@ ollama_generate <- function(prompt) {
   out$response
 }
 
+# ui ----
 ui <- fluidPage(
   titlePanel("Demo LLM con Ollama + R"),
-  
-  fluidRow(
-    column(
-      width = 6,
-      h4("Prompt para el LLM:"),
-      textAreaInput(
-        "prompt",
-        label = NULL,
-        value = "Explica qué es el muestreo en auditoría en máximo 3 líneas.",
-        rows = 8
-      ),
-      actionButton("go", "Generar texto con LLM")
-    ),
-    column(
-      width = 6,
-      h4("Respuesta del modelo:"),
-      verbatimTextOutput("llm_output"),
-      br(),
+  sidebarLayout(
+    sidebarPanel(
+      textAreaInput("prompt", "Prompt para el LLM:", rows = 6),
+      actionButton("go", "Generar texto con LLM"),
+      br(), br(),
       downloadButton("download_pdf", "Descargar respuesta en PDF")
+    ),
+    mainPanel(
+      h4("Respuesta del modelo:"),
+      verbatimTextOutput("llm_output")
     )
   )
 )
 
+# server ----
 server <- function(input, output, session) {
   
-  # Donde guardamos la última respuesta del LLM
   llm_text <- reactiveVal("")
   
-  # Botón para generar texto con barra de progreso
   observeEvent(input$go, {
     req(input$prompt)
     
-    withProgress(message = "Consultando modelo LLM...", value = 0, {
-      # 1) Llamamos al modelo
-      txt <- tryCatch(
-        {
-          incProgress(0.4, detail = "Generando respuesta...")
-          ollama_generate(input$prompt)
-        },
-        error = function(e) {
-          showNotification("Error al consultar el modelo LLM.", type = "error")
-          return("Ocurrió un error al consultar el modelo LLM.")
-        }
-      )
-      
-      # 2) Guardamos texto y actualizamos salida
-      incProgress(0.9, detail = "Procesando resultado...")
-      llm_text(txt)
-      
+    withProgress(message = "Consultando LLM...", value = 0, {
+      ans <- ollama_generate(input$prompt)
+      llm_text(ans)
+      output$llm_output <- renderText(ans)
       incProgress(1)
     })
   })
   
-  # Mostrar respuesta en pantalla
-  output$llm_output <- renderText({
-    llm_text()
-  })
-  
-  # Descargar en PDF
   output$download_pdf <- downloadHandler(
     filename = function() {
-      paste0("respuesta_llm_", Sys.Date(), ".pdf")
+      paste0("informe_llm_", format(Sys.time(), "%Y%m%d_%H%M"), ".pdf")
     },
     content = function(file) {
       req(llm_text())
-      req(input$prompt)
       
-      # Creamos un Rmd temporal con prompt + respuesta
+      # 1) Rmd temporal
       tmp_rmd <- tempfile(fileext = ".Rmd")
       
-      rmd_content <- paste0(
-        "---\n",
-        "title: \"Informe LLM\"\n",
-        "output: pdf_document\n",
-        "geometry: margin=2cm\n",
-        "---\n\n",
-        "## Prompt utilizado\n\n",
-        "```text\n",
-        input$prompt, "\n",
-        "```\n\n",
-        "## Respuesta del modelo\n\n",
-        llm_text(), "\n"
+      rmd_lines <- c(
+        "---",
+        "title: \"Informe generado con LLM\"",
+        "output: pdf_document",
+        "---",
+        "",
+        "## Respuesta del modelo",
+        "",
+        llm_text()
       )
       
-      writeLines(rmd_content, tmp_rmd)
+      writeLines(rmd_lines, tmp_rmd)
       
-      # Renderizamos a PDF
+      # 2) Render a PDF usando tinytex
       rmarkdown::render(
         input        = tmp_rmd,
         output_file  = file,
-        envir        = new.env(parent = globalenv()),
-        quiet        = TRUE
+        output_format = "pdf_document",
+        quiet        = TRUE,
+        envir        = new.env(parent = globalenv())
       )
-    }
+    },
+    contentType = "application/pdf"
   )
 }
 
