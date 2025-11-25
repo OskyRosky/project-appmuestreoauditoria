@@ -197,6 +197,7 @@ output$header_help_button <- renderUI({
 #     - p1  → guía COMPLETA (tu versión original, intacta)
 #     - p2+ → guías resumidas por módulo
 # ============================================================
+
 observeEvent(input$welcome_guide, {
 
   current_tab <- input$sidebar
@@ -206,94 +207,132 @@ observeEvent(input$welcome_guide, {
   # ------------------------------------------------------------
   # 1) SI ESTÁS EN p1 → MOSTRAR LA GUÍA COMPLETA ORIGINAL
   # ------------------------------------------------------------
-  if (current_tab == "p1") {
 
-    showModal(
-      modalDialog(
-        title = "Guía general de la aplicación",
-        size = "l",
-        easyClose = TRUE,
-        footer = modalButton("Cerrar"),
+ if (current_tab == "p1") {
 
-        tags$div(
-          style = "max-height:60vh; overflow-y:auto; font-size:13px;",
+  showModal(
+    modalDialog(
+      title = "Guía general de la aplicación",
+      size = "l",
+      easyClose = TRUE,
+      footer = modalButton("Cerrar"),
 
-          # ----- Introducción -----
-          tags$h4("Introducción"),
-          tags$p("Bienvenidos(as) a la aplicación especializada en el análisis de muestras para unidades monetarias."),
-          tags$p("Esta herramienta interactiva ha sido diseñada para facilitar el proceso de descripción, muestreo y evaluación de una muestra de unidades monetarias."),
+      tags$div(
+        style = "max-height:60vh; overflow-y:auto; font-size:13px;",
 
-          # ----- Cómo iniciar -----
-          tags$h4("¡Inicie utilizando la aplicación!"),
-          tags$p("Para comenzar, en cada sección de la barra lateral izquierda deberá:"),
-          tags$ul(
-            tags$li(tags$strong("Navegar:"), " utilice las pestañas del menú lateral para moverse entre los módulos."),
-            tags$li(tags$strong("Cargar datos:"), " use el botón gris de Cargar datos en cada módulo para subir su archivo."),
-            tags$li(tags$strong("Analizar:"), " siga las instrucciones específicas en cada sección para realizar el análisis requerido.")
+        # ----- Introducción -----
+        tags$h4("Introducción"),
+        tags$p(
+          "Bienvenidos(as) a la aplicación especializada en el análisis de muestras para unidades monetarias."
+        ),
+        tags$p(
+          "Esta herramienta interactiva ha sido diseñada para facilitar el proceso de ",
+          tags$strong("descripción, muestreo y evaluación"),
+          " de poblaciones monetarias en el contexto de la auditoría."
+        ),
+
+        # ----- Cómo iniciar -----
+        tags$h4("¡Inicie utilizando la aplicación!"),
+        tags$p("Para comenzar, en cada sección de la barra lateral izquierda deberá:"),
+        tags$ul(
+          tags$li(
+            tags$strong("Navegar: "),
+            "utilice las pestañas del menú lateral para moverse entre los distintos módulos."
           ),
-
-          # ----- Estructura de la aplicación -----
-          tags$h4("Estructura de la aplicación"),
-          tags$p("La aplicación se divide en módulos, cada uno enfocado en un aspecto crítico del muestreo en unidades monetarias:"),
-          tags$ul(
-            tags$li("Análisis descriptivo"),
-            tags$li("Proceso de muestreo (MUM y LES)"),
-            tags$li("Muestreo por atributos"),
-            tags$li("Evaluación de la muestra")
+          tags$li(
+            tags$strong("Cargar datos: "),
+            "use el botón gris de ",
+            tags$em("Cargar datos"),
+            " en cada módulo para subir su archivo."
           ),
-          tags$p("A continuación se describe brevemente cada módulo."),
+          tags$li(
+            tags$strong("Analizar: "),
+            "siga las instrucciones específicas en cada sección para ejecutar el análisis requerido."
+          )
+        ),
 
-          # ----- Análisis descriptivo -----
-          tags$h4("Análisis descriptivo"),
-          tags$ul(
-            tags$li("Analizar las principales estadísticas descriptivas de la variable de interés."),
-            tags$li("Examinar la distribución de la variable de interés."),
-            tags$li("Evaluar posibles ajustes de funciones de distribución.")
+        # ----- Estructura de la aplicación -----
+        tags$h4("Estructura de la aplicación"),
+        tags$p(
+          "La aplicación se organiza en módulos, cada uno enfocado en un aspecto clave del muestreo en unidades monetarias:"
+        ),
+        tags$ul(
+          tags$li(tags$strong("Análisis descriptivo:"), " comprensión inicial de la población."),
+          tags$li(tags$strong("Proceso de muestreo (MUM y LES):"), " diseño y selección de la muestra monetaria."),
+          tags$li(tags$strong("Muestreo por atributos:"), " enfoque para variables cualitativas o de cumplimiento."),
+          tags$li(tags$strong("Evaluación de la muestra:"), " contraste empírico entre lo observado y lo auditado.")
+        ),
+        tags$p("A continuación, se resume el objetivo de cada módulo."),
+
+        # ----- Análisis descriptivo -----
+        tags$h4("Análisis descriptivo"),
+        tags$ul(
+          tags$li("Analizar las principales estadísticas descriptivas de la variable de interés (totales, promedios, dispersión)."),
+          tags$li("Examinar la distribución de la variable para identificar sesgos, concentración y valores atípicos."),
+          tags$li("Explorar ajustes de funciones de distribución (por ejemplo, Normal, Poisson o Binomial) como insumo para el diseño muestral.")
+        ),
+
+        # ----- Proceso de muestreo (MUM y LES) -----
+        tags$h4("Proceso de muestreo (MUM y LES)"),
+        tags$ul(
+          tags$li("Determinar el tamaño de muestra según parámetros de riesgo, materialidad y criterios técnicos."),
+          tags$li("Visualizar la selección de unidades monetarias que conforman la muestra."),
+          tags$li("Comparar la distribución de la población original con la de la muestra obtenida."),
+          tags$li("Descargar la tabla de la muestra para su trabajo de auditoría de detalle.")
+        ),
+
+        # ----- Muestreo por atributos -----
+        tags$h4("Muestreo por atributos"),
+        tags$ul(
+          tags$li("Diseñar muestras cuando la variable de interés es categórica (cumple / no cumple, sí / no, etc.)."),
+          tags$li("Calcular el tamaño de muestra con base en proporciones esperadas de error y niveles de confianza."),
+          tags$li("Visualizar los elementos seleccionados y comparar porcentajes entre población y muestra."),
+          tags$li("Descargar los datos de la muestra para su documentación en papeles de trabajo.")
+        ),
+
+        # ----- Evaluación de la muestra -----
+        tags$h4("Evaluación de la muestra"),
+        tags$ul(
+          tags$li("Comparar valores observados (población o registros contables) versus valores auditados."),
+          tags$li("Describir y valorar las diferencias detectadas mediante indicadores de error y riesgo."),
+          tags$li("Definir y aplicar criterios o umbrales empíricos para concluir sobre la aceptabilidad de la población.")
+        ),
+
+        # ----- Reportes -----
+        tags$h4("Reportes de análisis"),
+        tags$p(
+          "Cada módulo cuenta con un botón de ",
+          tags$strong("'Descargar reporte'"),
+          ", que genera un documento en formato ",
+          tags$code(".docx"),
+          " con los resultados más relevantes para anexar a los papeles de trabajo."
+        ),
+
+        # ----- Sobre carga de datos -----
+        tags$h4("Sobre la carga de datos"),
+        tags$ul(
+          tags$li(
+            tags$strong("Formatos permitidos: "),
+            tags$code(".xlsx"), ", ",
+            tags$code(".csv"), " y ",
+            tags$code(".txt"),
+            "."
           ),
-
-          # ----- Proceso de muestreo (MUM y LES) -----
-          tags$h4("Proceso de muestreo (MUM y LES)"),
-          tags$ul(
-            tags$li("Determinar el tamaño de muestra."),
-            tags$li("Visualizar la selección de casos según el tamaño de muestra."),
-            tags$li("Comparar distribuciones entre datos originales y muestra."),
-            tags$li("Descargar los datos de la muestra.")
-          ),
-
-          # ----- Muestreo por atributos -----
-          tags$h4("Muestreo por atributos"),
-          tags$ul(
-            tags$li("Determinar el tamaño de muestra para variables categóricas."),
-            tags$li("Visualizar la selección de casos."),
-            tags$li("Comparar porcentajes entre población y muestra."),
-            tags$li("Descargar los datos seleccionados.")
-          ),
-
-          # ----- Evaluación de la muestra -----
-          tags$h4("Evaluación de la muestra"),
-          tags$ul(
-            tags$li("Comparar valores observados vs auditados."),
-            tags$li("Presentar indicadores de riesgo."),
-            tags$li("Definir criterios/umbrales tolerables.")
-          ),
-
-          # ----- Reportes -----
-          tags$h4("Reportes de análisis"),
-          tags$p("Cada módulo contiene un botón de 'Descargar reporte' en formato .docx."),
-
-          # ----- Sobre carga de datos -----
-          tags$h4("Sobre la carga de datos"),
-          tags$ul(
-            tags$li("Formatos permitidos: .xlsx, .csv, .txt"),
-            tags$li("Una sola tabla por archivo."),
-            tags$li("Máximo recomendado: 100 MB.")
+          tags$li("Cada archivo debe contener una sola tabla y estar previamente depurado."),
+          tags$li(
+            "El tamaño máximo ",
+            tags$strong("recomendado"),
+            " por archivo es de ",
+            tags$strong("100 MB"),
+            ", para mantener un desempeño fluido en la aplicación."
           )
         )
       )
     )
+  )
 
-    return()   # 👈 PARA QUE NO AVANCE A LOS OTROS MÓDULOS
-  }
+  return()   # 👈 PARA QUE NO AVANCE A LOS OTROS MÓDULOS
+}
 
 
 
