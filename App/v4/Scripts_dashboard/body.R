@@ -203,77 +203,136 @@ shinydashboard::tabItem(
   )
 ),
 
-    #################################################################
-    #                           PÁG. p2                             #
-    #                    📊 ANÁLISIS DESCRIPTIVO                    #
-    #################################################################
-    shinydashboard::tabItem(
-      tabName = "p2",
+ #################################################################
+#                           PÁG. p2                             #
+#                    📊 ANÁLISIS DESCRIPTIVO                    #
+#################################################################
+shinydashboard::tabItem(
+  tabName = "p2",
 
-      h1("Análisis Descriptivos", align = "center"),
-      br(),
-       
-      # --- Carga de datos ---
-      h3("Cargar datos", align = "left"),
-      fileInput(
-        "file1", "Importar datos",
-        accept = c(
-          ".csv", ".txt", ".xlsx",
-          "text/csv", "text/plain", "text/tab-separated-values",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-      ),
-      uiOutput("variable_select_1"),
-      h4("IMPORTANTE: Debe seleccionar variables numéricas.", align = "left", style = "font-weight: bold"),
-      uiOutput("negativesAlert_1"),
-      br(),
+  h1("Análisis Descriptivos", align = "center"),
+  br(),
+   
+  # --- Carga de datos ---
+  h3("Cargar datos", align = "left"),
+  fileInput(
+    "file1", "Importar datos",
+    accept = c(
+      ".csv", ".txt", ".xlsx",
+      "text/csv", "text/plain", "text/tab-separated-values",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+  ),
+  uiOutput("variable_select_1"),
+  h4("IMPORTANTE: Debe seleccionar variables numéricas.", align = "left", style = "font-weight: bold"),
+  uiOutput("negativesAlert_1"),
+  br(),
 
-      # --- Lanzar análisis ---
-      actionButton("start_analysis", "Iniciar Análisis Descriptivos", class = "btn-primary"),
-      uiOutput("analysis_output"),
-      br(),
+  # --- Lanzar análisis ---
+  actionButton("start_analysis", "Iniciar Análisis Descriptivos", class = "btn-primary"),
+  uiOutput("analysis_output"),
+  br(),
 
-      # --- Estadísticas descriptivas ---
-      h3("Estadísticas descriptivas", align = "left"),
-      br(),
-      h4("Se presentan las principales para la variable numérica seleccionada."),
-      reactableOutput("stats"),
-      br(),
+  # --- Estadísticas descriptivas ---
+  h3("Estadísticas descriptivas", align = "left"),
+  br(),
+  h4("Se presentan las principales para la variable numérica seleccionada."),
+  reactableOutput("stats"),
+  br(),
 
-      # --- Distribución ---
-      h3("Análisis de distribuciones", align = "left"),
-      br(),
-      h4("Densidad de la variable numérica seleccionada."),
-      br(),
-      highchartOutput("histogram1"),
+  # --- Distribución ---
+  h3("Análisis de distribuciones", align = "left"),
+  br(),
+  h4("Densidad de la variable numérica seleccionada."),
+  br(),
+  highchartOutput("histogram1"),
 
-      # --- Comparación de ajustes ---
-      h3("Comparación de Ajuste de Distribuciones", align = "left"),
-      br(),
-      h4("Guía visual para elegir la distribución."),
+  # --- Comparación de ajustes ---
+  h3("Comparación de Ajuste de Distribuciones", align = "left"),
+  br(),
+  h4("Guía visual para elegir la distribución."),
+  fluidRow(
+    shinydashboard::box(
+      title = "Comparación de distribuciones",
+      status = "primary",
+      solidHeader = TRUE,
+      collapsible = TRUE,
+      width = 12,
       fluidRow(
-        shinydashboard::box(
-          title = "Comparación de distribuciones",
-          status = "primary",
-          solidHeader = TRUE,
-          collapsible = TRUE,
-          width = 12,
-          fluidRow(
-            column(width = 6, plotOutput("binomialPlot")),
-            column(width = 6, plotOutput("poissonPlot"))
-          )
-        )
-      ),
-      h4("Si hay valores muy extremos, Poisson puede ser más adecuado; si están más compactos, Binomial."),
-      br(),
-
-      # --- Reporte ---
-      h3("Descargar Reporte", align = "left"),
-      conditionalPanel(                                           # NEW
-        condition = "output.showDownloads",                       # NEW
-        downloadButton("downloadReport1", "Descargar Reporte Análisis Descriptivo")
+        column(width = 6, plotOutput("binomialPlot")),
+        column(width = 6, plotOutput("poissonPlot"))
       )
+    )
+  ),
+  h4("Si hay valores muy extremos, Poisson puede ser más adecuado; si están más compactos, Binomial."),
+  br(),
+
+  # --- Reporte clásico (DOCX con officer/flextable) ---
+  h3("Descargar Reporte", align = "left"),
+  conditionalPanel(
+    condition = "output.showDownloads",
+    downloadButton("downloadReport1", "Descargar Reporte Análisis Descriptivo")
+  ),
+
+  br(), hr(),
+
+  # =====================================================
+  # 🧠 NUEVO BLOQUE: Informe automatizado con LLM
+  # =====================================================
+  h3("Informe automatizado (LLM)", align = "left"),
+  helpText(
+    "Opcionalmente, la aplicación puede redactar un informe breve ",
+    "conclusivo sobre los resultados descriptivos utilizando un modelo de lenguaje (LLM)."
+  ),
+
+  # 1) Pregunta de activación
+  radioButtons(
+    inputId = "want_llm_desc",
+    label   = "¿Desea que se genere un informe redactado para papeles de trabajo?",
+    choices = c("No por el momento" = "no", "Sí, generar informe con LLM" = "si"),
+    selected = "no",
+    inline = FALSE
+  ),
+
+  # 2) Contenido visible solo si el usuario elige "sí"
+  conditionalPanel(
+    condition = "input.want_llm_desc == 'si'",
+
+    br(),
+    # 👉 Campo de contexto que alimentará al LLM
+    textAreaInput(
+      inputId = "llm_desc_context",
+      label   = "Explique la temática, la entidad o empresa auditada y el objetivo del análisis descriptivo:",
+      placeholder = paste(
+        "Ejemplo: Análisis descriptivo de la cartera de cuentas por cobrar del Ministerio X,",
+        "para evaluar concentración de saldos y apoyar la planificación de pruebas sustantivas."
+      ),
+      rows = 4
     ),
+
+    br(),
+    actionButton(
+      inputId = "btn_llm_desc_generate",
+      label   = "Generar informe con LLM",
+      class   = "btn-success"
+    ),
+    br(), br(),
+
+    # Estado / mensajes (lo llenaremos en server.R)
+    textOutput("llm_desc_status"),
+    br(),
+
+    h4("Borrador de informe generado:", align = "left"),
+    verbatimTextOutput("llm_desc_preview"),
+
+    br(),
+    # Botón para descargar el informe LLM en DOCX
+    downloadButton(
+      outputId = "download_llm_desc_docx",
+      label    = "Descargar informe LLM (.docx)"
+    )
+  )
+),
 
     #################################################################
     #                           PÁG. p3                             #
