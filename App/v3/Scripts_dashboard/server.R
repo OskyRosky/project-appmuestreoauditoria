@@ -374,13 +374,51 @@ observeEvent(input$welcome_guide, {
 
     # ---------- p4 ----------
     p4 = tagList(
-      tags$h4("Módulo Muestra LES"),
-      tags$ul(
-        tags$li("Configure parámetros del método LES."),
-        tags$li("Genere el tamaño y composición de la muestra."),
-        tags$li("Compare distribución población vs muestra.")
+  tags$h4("Módulo Muestra LES"),
+
+  tags$p(
+    "En este módulo se aplica el método de muestreo basado en el ",
+    tags$strong("Límite de Error Superior (LES)"),
+    ", una técnica utilizada cuando los importes monetarios requieren un criterio de tolerancia ",
+    "explícito para definir la magnitud aceptable del error en auditoría."
+  ),
+
+  tags$p(
+    "El proceso está diseñado para determinar un tamaño de muestra coherente con el criterio definido ",
+    "por el auditor y generar una selección que represente adecuadamente la población monetaria."
+  ),
+
+  tags$ul(
+    tags$li("Cargar la población completa de montos que serán evaluados mediante el criterio LES."),
+    tags$li(
+      tagList(
+        "Definir el ",
+        tags$strong("criterio LES"),
+        ", el cual corresponde a una cifra que establece el límite de error permitido en la evaluación."
       )
     ),
+    tags$li("Calcular el tamaño de muestra requerido según el criterio seleccionado."),
+    tags$li("Visualizar las unidades seleccionadas como parte de la muestra LES."),
+    tags$li("Comparar la distribución de la población original con la distribución de la muestra generada."),
+    tags$li(
+      tagList(
+        "Descargar la muestra seleccionada en formatos ",
+        tags$code(".csv"), ", ",
+        tags$code(".txt"), " o ",
+        tags$code(".xlsx"),
+        " para su utilización en auditoría."
+      )
+    ),
+    tags$li(
+      tagList(
+        "Generar un informe en formato ",
+        tags$code(".docx"),
+        " con los principales resultados y comparaciones realizadas, ",
+        "listo para incluirse en los papeles de trabajo."
+      )
+    )
+  )
+),
 
     # ---------- p5 ----------
     p5 = tagList(
