@@ -55,13 +55,20 @@ if (os_name %in% c("Darwin", "Windows")) {
   "stats", "MASS", "fitdistrplus", "forecast", "jfa",
 
   # --- Utilidades y soporte ---
-  "RcppRoll", "sunburstR", "d3r"
+  "RcppRoll", "sunburstR", "d3r",
+
+  # --- 🔁 Integración LLM (Ollama) + reportes DOCX ---
+  # httr2/jsonlite → llamadas HTTP y parseo JSON
+  # rmarkdown      → generación de Rmd / informes si se requiere
+  "httr2", "jsonlite", "rmarkdown"
 )
 
-# --- NUEVO ---
 # Paquetes “pesados” que requieren librerías nativas del sistema (macOS/Linux)
 .heavy <- c(
+  # --- Reportes en Word y tablas ricas ---
   "kableExtra", "officer", "flextable",
+
+  # --- Gráficos y renderizado avanzado ---
   "svglite", "ragg", "systemfonts", "textshaping",
   "magick", "rsvg", "pdftools"
 )
@@ -72,8 +79,8 @@ if (os_name %in% c("Darwin", "Windows")) {
 # APP_BOOTSTRAP = TRUE → fuerza reinstalación.
 # APP_HEAVY = TRUE → incluye paquetes pesados.
 # =========================================================
-.force_install <- isTRUE(as.logical(Sys.getenv("APP_BOOTSTRAP", "FALSE")))
-.install_heavy <- isTRUE(as.logical(Sys.getenv("APP_HEAVY", "FALSE")))
+.force_install  <- isTRUE(as.logical(Sys.getenv("APP_BOOTSTRAP", "FALSE")))
+.install_heavy  <- isTRUE(as.logical(Sys.getenv("APP_HEAVY", "FALSE")))
 
 # =========================================================
 # (3) Función para instalar paquetes faltantes
@@ -108,8 +115,7 @@ if (os_name %in% c("Darwin", "Windows")) {
 .instalar_si_faltan(.core, force = .force_install)
 .cargar_todos(.core)
 
-# --- NUEVO BLOQUE ---
-# (5.1) Cargar paquetes pesados solo si APP_HEAVY=TRUE
+# --- (5.1) Cargar paquetes pesados solo si APP_HEAVY=TRUE ---
 if (.install_heavy) {
   try({
     .instalar_si_faltan(.heavy, force = .force_install)
