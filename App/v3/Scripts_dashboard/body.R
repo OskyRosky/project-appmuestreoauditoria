@@ -408,23 +408,6 @@ shinydashboard::tabItem(
 
       h1("Muestreo LES", align = "center"),
       br(),
-
-      h2("En esta sección:", align = "left"),
-      br(),
-      h4("Muestreo por LES: tamaño y selección.", align = "left"),
-      br(),
-      h4("Cargando los datos, usted podrá:"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Calcular el tamaño de muestra.", align = "left")),
-        tags$li(h4("Visualizar las unidades seleccionadas.", align = "left")),
-        tags$li(h4("Comparar datos cargados vs muestra.", align = "left")),
-        tags$li(h4("Descargar la muestra.", align = "left")),
-        tags$li(h4("Descargar resultados en '.docx'.", align = "left"))
-      ),
-      br(),
-
       # --- Carga de datos ---
       h3("Cargar datos", align = "left"),
       br(),
