@@ -2,10 +2,18 @@
 library(shiny)
 library(httr2)
 library(jsonlite)
-library(tinytex)
 library(rmarkdown)
 
-# --- Función para hablar con Ollama ---
+# ---------- 1. Ver si Ollama está disponible ----------
+ollama_available <- function() {
+  url <- "http://localhost:11434/api/tags"
+  tryCatch({
+    request(url) |> req_perform()
+    TRUE
+  }, error = function(e) FALSE)
+}
+
+# ---------- 2. Función para llamar al LLM de Ollama ----------
 ollama_generate <- function(prompt) {
   url <- "http://localhost:11434/api/generate"
   
@@ -20,10 +28,10 @@ ollama_generate <- function(prompt) {
     req_perform()
   
   out <- resp_body_json(resp)
-  out$response
+  enc2utf8(out$response)   # asegurar UTF-8
 }
 
-# ui ----
+# ---------- 3. UI ----------
 ui <- fluidPage(
   titlePanel("Demo LLM con Ollama + R"),
   sidebarLayout(
@@ -31,16 +39,19 @@ ui <- fluidPage(
       textAreaInput("prompt", "Prompt para el LLM:", rows = 6),
       actionButton("go", "Generar texto con LLM"),
       br(), br(),
-      downloadButton("download_pdf", "Descargar respuesta en PDF")
+      downloadButton("download_docx", "Descargar respuesta en .docx")
     ),
     mainPanel(
       h4("Respuesta del modelo:"),
-      verbatimTextOutput("llm_output")
+      tags$div(
+        style = "background:#f8f9fa; border:1px solid #ccc; padding:12px; border-radius:6px;",
+        verbatimTextOutput("llm_output")
+      )
     )
   )
 )
 
-# server ----
+# ---------- 4. Server ----------
 server <- function(input, output, session) {
   
   llm_text <- reactiveVal("")
@@ -48,28 +59,36 @@ server <- function(input, output, session) {
   observeEvent(input$go, {
     req(input$prompt)
     
-    withProgress(message = "Consultando LLM...", value = 0, {
+    if (!ollama_available()) {
+      showNotification("❌ Ollama no está activo. Ejecuta 'ollama serve' en la terminal.", type = "error")
+      return()
+    }
+    
+    withProgress(message = "Generando respuesta...", value = 0, {
+      incProgress(0.2)
       ans <- ollama_generate(input$prompt)
+      incProgress(0.9)
       llm_text(ans)
       output$llm_output <- renderText(ans)
       incProgress(1)
     })
   })
   
-  output$download_pdf <- downloadHandler(
+  # ---------- 5. Descarga en DOCX ----------
+  output$download_docx <- downloadHandler(
     filename = function() {
-      paste0("informe_llm_", format(Sys.time(), "%Y%m%d_%H%M"), ".pdf")
+      paste0("informe_llm_", format(Sys.time(), "%Y%m%d_%H%M"), ".docx")
     },
     content = function(file) {
       req(llm_text())
       
-      # 1) Rmd temporal
+      # Rmd temporal
       tmp_rmd <- tempfile(fileext = ".Rmd")
       
       rmd_lines <- c(
         "---",
         "title: \"Informe generado con LLM\"",
-        "output: pdf_document",
+        "output: word_document",
         "---",
         "",
         "## Respuesta del modelo",
@@ -79,16 +98,15 @@ server <- function(input, output, session) {
       
       writeLines(rmd_lines, tmp_rmd)
       
-      # 2) Render a PDF usando tinytex
       rmarkdown::render(
-        input        = tmp_rmd,
-        output_file  = file,
-        output_format = "pdf_document",
-        quiet        = TRUE,
-        envir        = new.env(parent = globalenv())
+        input         = tmp_rmd,
+        output_file   = file,
+        output_format = "word_document",
+        quiet         = TRUE,
+        envir         = new.env(parent = globalenv())
       )
     },
-    contentType = "application/pdf"
+    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   )
 }
 
