@@ -478,23 +478,104 @@ observeEvent(input$welcome_guide, {
 
     # ---------- p6 ----------
     p6 = tagList(
-      tags$h4("Evaluación de la Muestra"),
-      tags$ul(
-        tags$li("Ingrese los valores auditados."),
-        tags$li("Compare observados vs auditados."),
-        tags$li("Revise indicadores de error proyectado y riesgo.")
-      )
+  tags$h4("Módulo Evaluación de la Muestra"),
+
+  tags$p(
+    "Este módulo permite realizar la ",
+    tags$strong("evaluación empírica de la muestra monetaria"),
+    " mediante la comparación entre los valores ",
+    tags$em("observados"),
+    " y los valores ",
+    tags$em("auditados"),
+    " durante el trabajo de detalle."
+  ),
+
+  tags$p(
+    "El propósito es determinar si las diferencias encontradas en la muestra ",
+    "representan riesgos materiales para la población completa, ",
+    "y si los resultados cumplen con los umbrales definidos por el auditor."
+  ),
+
+  tags$ul(
+    tags$li(
+      "Cargar los resultados auditados correspondientes a la muestra previamente seleccionada."
     ),
+    tags$li(
+      "Comparar los valores observados versus auditados, identificando diferencias absolutas y relativas."
+    ),
+    tags$li(
+      "Analizar de forma descriptiva las diferencias: montos, comportamiento de las desviaciones y su concentración."
+    ),
+    tags$li(
+      "Calcular indicadores de riesgo y error proyectado para determinar la aceptabilidad de la población auditada."
+    ),
+    tags$li(
+      "Evaluar criterios o umbrales empíricos definidos por el auditor, ",
+      "determinando si la muestra respalda una conclusión razonable sobre la población."
+    ),
+    tags$li(
+      tagList(
+        "Descargar los resultados de evaluación en formato ",
+        tags$code(".docx"),
+        ", incluyendo tablas comparativas, indicadores de riesgo y conclusiones clave ",
+        "para los papeles de trabajo."
+      )
+    )
+  )
+),
 
     # ---------- FAQ ----------
     faq = tagList(
-      tags$h4("Preguntas frecuentes"),
-      tags$ul(
-        tags$li("Formatos permitidos: .csv, .txt, .xlsx"),
-        tags$li("Peso sugerido máximo: 100 MB"),
-        tags$li("Puede descargar reportes en cada módulo.")
+  tags$h4("Preguntas frecuentes (FAQ)"),
+
+  tags$ul(
+
+    tags$li(
+      tags$strong("¿Qué formatos de archivo acepta la aplicación?"),
+      tags$p(
+        "Puede cargar archivos en formato ",
+        tags$code(".xlsx"), ", ",
+        tags$code(".csv"), " o ",
+        tags$code(".txt"), 
+        ". Cada archivo debe contener una sola tabla y estar limpio para su análisis."
       )
     ),
+
+    tags$li(
+      tags$strong("¿Cuál es el tamaño máximo recomendado para los archivos?"),
+      tags$p(
+        "Se recomienda un peso máximo de ",
+        tags$strong("100 MB"),
+        " por archivo, para garantizar un desempeño fluido en la aplicación."
+      )
+    ),
+
+    tags$li(
+      tags$strong("¿En qué módulos puedo generar reportes en .docx?"),
+      tags$p("Los reportes en formato .docx pueden generarse en:"),
+      tags$ul(
+        tags$li("Análisis descriptivo"),
+        tags$li("Muestreo MUM"),
+        tags$li("Muestreo LES"),
+        tags$li("Muestreo por atributos"),
+        tags$li("Evaluación de la muestra")
+      )
+    ),
+
+    tags$li(
+      tags$strong("¿Por qué la aplicación no me permite descargar el reporte?"),
+      tags$p(
+        "Verifique que la aplicación se esté ejecutando en modo pesado ",
+        tags$code("APP_HEAVY = TRUE"),
+        " y que los paquetes ",
+        tags$code("officer"),
+        " y ",
+        tags$code("flextable"),
+        " estén instalados en su entorno de R."
+      )
+    )
+  )
+),
 
     # ---------- Default ----------
     tagList(tags$p("Guía rápida del módulo actual."))

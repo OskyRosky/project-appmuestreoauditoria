@@ -661,23 +661,8 @@ shinydashboard::tabItem(
     shinydashboard::tabItem(
       tabName = "p6",
 
-      h1("Evaluación de la auditoría.", align = "center"),
+      h1("Evaluación muestreo en auditoría.", align = "center"),
       br(),
-
-      h2("En esta sección:", align = "left"),
-      br(),
-      h4("Comparación observados vs auditados; indicadores y umbrales.", align = "left"),
-      br(),
-      tags$ul(
-        style = .ul_style,
-        tags$li(h4("Comparar observados vs auditados.", align = "left")),
-        tags$li(h4("Valorar diferencias de forma descriptiva.", align = "left")),
-        tags$li(h4("Analizar indicadores de riesgo.", align = "left")),
-        tags$li(h4("Evaluar criterios empíricos (umbrales).", align = "left")),
-        tags$li(h4("Descargar resultados en '.docx'.", align = "left"))
-      ),
-      br(),
-
       # --- Carga de datos ---
       h3("Cargar datos", align = "left"),
       fileInput(
