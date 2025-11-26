@@ -1029,8 +1029,74 @@ div(
       conditionalPanel(                                           # NEW
         condition = "output.showDownloads",                       # NEW
         downloadButton("downloadReport5", "Descargar Reporte Evaluación")
+      ),
+
+      br(), hr(),
+
+      # =====================================================
+      # 🧠 Informe automatizado (LLM) - Evaluación
+      # =====================================================
+      h3("Informe automatizado (LLM)", align = "left"),
+      tags$p(
+        "Opcionalmente, la aplicación puede redactar un informe breve y conclusivo ",
+        "sobre los resultados de la evaluación del muestreo utilizando un modelo de lenguaje (LLM)."
+      ),
+
+      # Contexto que el usuario aporta al modelo
+      textAreaInput(
+        inputId    = "p6_llm_context",
+        label      = "Explique la temática, la entidad o empresa auditada y el objetivo de la evaluación:",
+        placeholder = "Ejemplo: Evaluación de resultados de muestreo sobre cuentas por cobrar del Ministerio X, comparando montos observados vs auditados.",
+        rows       = 4
+      ),
+
+      actionButton(
+        inputId = "p6_llm_generate",
+        label   = "Generar informe con LLM",
+        class   = "btn-success"
+      ),
+      br(), br(),
+
+      h4("Tentativa de informe generado:"),
+
+      # Caja estilizada para el texto del LLM (mismo estilo que los demás)
+      div(
+        id = "p6_llm_box",
+        style = "
+          background: #f8f9fa;
+          border: 1px solid #d0d4d9;
+          border-radius: 8px;
+          padding: 12px;
+          max-height: 250px;
+          overflow-y: auto;          /* solo scroll vertical */
+          overflow-x: hidden;        /* sin scroll horizontal */
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          margin-bottom: 15px;
+          max-width: 650px;
+        ",
+        tags$style("
+          #p6_llm_box pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+          }
+        "),
+        verbatimTextOutput("p6_llm_preview")
+      ),
+
+      shinyjs::hidden(
+        downloadButton(
+          outputId = "p6_llm_docx",
+          label    = "Descargar informe LLM (.docx)"
+        )
       )
+
     ),
+
+    #################################################################
+    #                           PÁG. faq                            #
+    #                          🧾 LOS FAQS                          #
+    #################################################################
 
 shinydashboard::tabItem(
       tabName = "faq",

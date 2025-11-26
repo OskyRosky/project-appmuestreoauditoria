@@ -1975,7 +1975,10 @@ output$download5.3 <- downloadHandler(
       dplyr::arrange(dplyr::desc(Diferencia))
   })
 
+  # ----
   # ---- 5.2 Acciones al presionar "Evaluación" --------------------------
+  # ----
+
   observeEvent(input$analizar, {
 
     # Tabla base
@@ -2070,6 +2073,7 @@ output$download5.3 <- downloadHandler(
       filename = function() paste0("Diferencias-", Sys.Date(), ".txt"),
       content  = function(file) utils::write.table(Diferencias(), file, row.names = FALSE)
     )
+
 output$download3.3 <- downloadHandler(
   filename = function() paste0("Diferencias-", Sys.Date(), ".xlsx"),
   contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -2079,9 +2083,13 @@ output$download3.3 <- downloadHandler(
       df <- .sanitize_for_xlsx(Diferencias())
       openxlsx::write.xlsx(df, file)
     }, error = function(e) {
-      showNotification(paste("No se pudo generar XLSX (Diferencias):", conditionMessage(e)),
-                       type = "error", duration = 10)
-      validate(need(FALSE, "Fallo al generar XLSX (Diferencias)."))
+      showNotification(
+        paste("No se pudo generar XLSX (Diferencias):", conditionMessage(e)),
+        type = "error", duration = 10
+      )
+      shiny::validate(
+        shiny::need(FALSE, "Fallo al generar XLSX (Diferencias).")
+      )
     })
   }
 )
@@ -2215,9 +2223,155 @@ output$download3.3 <- downloadHandler(
 
         print(doc, target = file)
       }, error = function(e) {
-        showNotification(paste("No se pudo generar el DOCX (Evaluación):", conditionMessage(e)), type = "error", duration = 10)
-        validate(need(FALSE, "Fallo en la generación del reporte DOCX (Evaluación)."))
+        showNotification(
+          paste("No se pudo generar el DOCX (Evaluación):", conditionMessage(e)),
+          type = "error", duration = 10
+        )
+        shiny::validate(
+          shiny::need(FALSE, "Fallo en la generación del reporte DOCX (Evaluación).")
+        )
       })
     }
   )
+
+  # =====================================================================
+  # 5.4 Informe automatizado Evaluación (LLM)
+  # =====================================================================
+
+  p6_llm_text <- reactiveVal("")
+
+  observeEvent(input$p6_llm_generate, {
+    # Necesitamos que ya existan los datos de evaluación
+    req(DatosEval(), Diferencias())
+
+    dd  <- DatosEval()
+    dif <- Diferencias()
+
+    # Métricas básicas para el resumen (independiente de las funciones internas)
+    suma_obs <- round(sum(dd$Observado, na.rm = TRUE), 1)
+    suma_aud <- round(sum(dd$Auditado,  na.rm = TRUE), 1)
+    n_casos  <- nrow(dd)
+    dif_total <- round(sum(abs(dd$Observado - dd$Auditado), na.rm = TRUE), 1)
+    porc_dif  <- round((dif_total / max(suma_aud, 1e-9)) * 100, 1)
+    conteo_dif <- sum(dd$Observado != dd$Auditado, na.rm = TRUE)
+
+    # Sobrevaloraciones e infravaloraciones
+    sobrev   <- sum(dd$Observado > dd$Auditado, na.rm = TRUE)
+    infrav   <- sum(dd$Observado < dd$Auditado, na.rm = TRUE)
+    suma_sobrev <- round(
+      sum(dd$Observado[dd$Observado > dd$Auditado] -
+            dd$Auditado[dd$Observado > dd$Auditado], na.rm = TRUE),
+      1
+    )
+    suma_infrav <- round(
+      sum(dd$Auditado[dd$Observado < dd$Auditado] -
+            dd$Observado[dd$Observado < dd$Auditado], na.rm = TRUE),
+      1
+    )
+
+    # Resumen textual para el modelo
+    resumen <- paste0(
+      "Archivo evaluado: ", input$file5$name, ".\n",
+      "Variable observada: ", input$select_var1, ".\n",
+      "Variable auditada: ", input$select_var2, ".\n",
+      "Número de partidas evaluadas: ", n_casos, ".\n",
+      "Suma total observada: ", suma_obs, ".\n",
+      "Suma total auditada: ", suma_aud, ".\n",
+      "Diferencia monetaria total (en valor absoluto): ", dif_total, ".\n",
+      "Porcentaje de diferencia respecto al total auditado: ", porc_dif, "%.\n",
+      "Conteo de partidas con diferencia: ", conteo_dif, ".\n",
+      "Cantidad de sobrevaloraciones: ", sobrev, " (monto total: ", suma_sobrev, ").\n",
+      "Cantidad de infravaloraciones: ", infrav, " (monto total: ", suma_infrav, ").\n"
+    )
+
+    # Si existe tabla de decisión de umbrales, la usamos como contexto extra
+    resumen_decision <- ""
+    if (!is.null(rv$eval_decision)) {
+      resumen_decision <- paste0(
+        "\nResultados del criterio empírico de evaluación (umbrales vs valores):\n",
+        paste0(
+          "  - ", rv$eval_decision$Indicador, ": valor = ",
+          rv$eval_decision$Valor, ", umbral = ",
+          rv$eval_decision$Umbral, ", decisión = ",
+          rv$eval_decision$Decision,
+          collapse = "\n"
+        ),
+        "\n"
+      )
+    }
+
+    # Contexto del usuario
+    contexto_usuario <- input$p6_llm_context
+    if (!nzchar(contexto_usuario)) {
+      contexto_usuario <- "El usuario no proporcionó contexto adicional."
+    }
+
+    # Prompt final
+    prompt_llm <- paste0(
+      "Eres un auditor financiero especializado en la evaluación de resultados de muestreo.\n\n",
+      "Contexto general del encargo de auditoría:\n",
+      contexto_usuario, "\n\n",
+      "Resumen cuantitativo de la evaluación Observado vs Auditado:\n",
+      resumen, "\n",
+      resumen_decision, "\n",
+      "Con base en esta información, redacta un párrafo claro y conciso ",
+      "(entre 8 y 12 líneas) que describa:\n",
+      "- El comportamiento general de las diferencias entre montos observados y auditados.\n",
+      "- La magnitud relativa de las sobrevaloraciones e infravaloraciones.\n",
+      "- La interpretación de estos resultados en términos de riesgo de incorrección material ",
+      "y la necesidad (o no) de extender pruebas de auditoría.\n\n",
+      "Escribe en español, en tono técnico pero entendible, sin viñetas ni listas."
+    )
+
+    withProgress(message = "Generando informe con LLM...", value = 0, {
+      ans <- ollama_generate(prompt_llm)
+
+      p6_llm_text(ans)
+      output$p6_llm_preview <- renderText(ans)
+      shinyjs::show("p6_llm_docx")
+
+      incProgress(1)
+    })
+  })
+
+  # Descarga DOCX del informe LLM de Evaluación
+  output$p6_llm_docx <- downloadHandler(
+    filename = function() {
+      paste0("Informe_LLM_Evaluacion_", Sys.Date(), ".docx")
+    },
+    content = function(file) {
+      tryCatch({
+        req(p6_llm_text())
+        if (!requireNamespace("officer", quietly = TRUE)) {
+          stop("El paquete 'officer' es necesario para generar el DOCX.")
+        }
+
+        doc <- officer::read_docx() |>
+          officer::body_add_par("Informe automatizado - Evaluación de muestreo", style = "heading 1") |>
+          officer::body_add_par(paste("Archivo de datos:", input$file5$name), style = "heading 2") |>
+          officer::body_add_par(
+            paste("Variables evaluadas: Observado =", input$select_var1,
+                  ", Auditado =", input$select_var2),
+            style = "heading 3"
+          ) |>
+          officer::body_add_par(
+            "Conclusión generada con modelo de lenguaje (LLM):",
+            style = "heading 3"
+          ) |>
+          officer::body_add_par(p6_llm_text(), style = "Normal")
+
+        print(doc, target = file)
+      }, error = function(e) {
+        showNotification(
+          paste("No se pudo generar el DOCX (Informe LLM Evaluación):", conditionMessage(e)),
+          type = "error", duration = 10
+        )
+        shiny::validate(
+          shiny::need(FALSE, "Fallo en la generación del informe LLM (Evaluación).")
+        )
+      })
+    },
+    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+
 }
