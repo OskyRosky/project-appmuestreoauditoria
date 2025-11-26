@@ -1897,7 +1897,7 @@ output$download5.3 <- downloadHandler(
     )
 
     withProgress(message = "Generando informe con LLM...", value = 0, {
-      ans <- .ollama_generate(prompt_llm)   # usa el mismo helper que en MUM y LES
+      ans <- ollama_generate(prompt_llm)   # usa el mismo helper que en MUM y LES
 
       p5_llm_text(ans)
       output$p5_llm_preview <- renderText(ans)
