@@ -999,9 +999,12 @@ output$downloadReport1 <- downloadHandler(
     })
 
     # 2.2.3 Selección PPT
-    datos <- data2()
-    total_valor <- sum(datos[[input$variable2]], na.rm = TRUE)
-    validate(need(total_valor > 0, "La suma de la variable es 0; imposible muestrear por PPT."))
+datos <- data2()
+total_valor <- sum(datos[[input$variable2]], na.rm = TRUE)
+shiny::validate(
+  shiny::need(total_valor > 0,
+              "La suma de la variable es 0; imposible muestrear por PPT.")
+)
 
     set.seed(rv$seed_mum)
     prob <- datos[[input$variable2]] / total_valor
@@ -1050,10 +1053,12 @@ output$download2.3 <- downloadHandler(
       df <- .sanitize_for_xlsx(rv$muestra_mum)
       openxlsx::write.xlsx(df, file)
     }, error = function(e) {
-      showNotification(paste("No se pudo generar XLSX (MUM):", conditionMessage(e)),
-                       type = "error", duration = 10)
-      validate(need(FALSE, "Fallo al generar XLSX (MUM)."))
-    })
+  showNotification(paste("No se pudo generar XLSX (MUM):", conditionMessage(e)),
+                   type = "error", duration = 10)
+  shiny::validate(
+    shiny::need(FALSE, "Fallo al generar XLSX (MUM).")
+  )
+})
   }
 )
 
@@ -1113,11 +1118,13 @@ output$downloadReport2 <- downloadHandler(
 
       print(doc, target = file)
 
-    }, error = function(e) {
-      showNotification(paste("No se pudo generar el DOCX (MUM):", conditionMessage(e)),
-                       type = "error", duration = 10)
-      validate(need(FALSE, "Fallo en la generación del reporte DOCX (MUM)."))
-    })
+}, error = function(e) {
+  showNotification(paste("No se pudo generar el DOCX (MUM):", conditionMessage(e)),
+                   type = "error", duration = 10)
+  shiny::validate(
+    shiny::need(FALSE, "Fallo en la generación del reporte DOCX (MUM).")
+  )
+})
   }
 )
 
@@ -1383,6 +1390,7 @@ output$p3_llm_docx <- downloadHandler(
     filename = function() paste0("MuestraLES-", Sys.Date(), ".txt"),
     content  = function(file) utils::write.table(rv$muestra_les, file, row.names = FALSE)
   )
+
 output$download4.3 <- downloadHandler(
   filename = function() paste0("MuestraLES-", Sys.Date(), ".xlsx"),
   contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -1392,9 +1400,13 @@ output$download4.3 <- downloadHandler(
       df <- .sanitize_for_xlsx(rv$muestra_les)
       openxlsx::write.xlsx(df, file)
     }, error = function(e) {
-      showNotification(paste("No se pudo generar XLSX (LES):", conditionMessage(e)),
-                       type = "error", duration = 10)
-      validate(need(FALSE, "Fallo al generar XLSX (LES)."))
+      showNotification(
+        paste("No se pudo generar XLSX (LES):", conditionMessage(e)),
+        type = "error", duration = 10
+      )
+      shiny::validate(
+        shiny::need(FALSE, "Fallo al generar XLSX (LES).")
+      )
     })
   }
 )
@@ -1483,7 +1495,9 @@ output$downloadReport3 <- downloadHandler(
         paste("No se pudo generar el DOCX (LES):", conditionMessage(e)),
         type = "error", duration = 10
       )
-      validate(need(FALSE, "Fallo en la generación del reporte DOCX (LES)."))
+      shiny::validate(
+        shiny::need(FALSE, "Fallo en la generación del reporte DOCX (LES).")
+      )
     })
   }
 )
