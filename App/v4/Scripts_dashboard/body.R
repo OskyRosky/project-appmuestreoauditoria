@@ -302,24 +302,34 @@ shinydashboard::tabItem(
       ),
       br(), br(),
 
-      h4("Tentativa de informe generado:"),
-      # Caja estilizada para mostrar el resultado del LLM
-  div(
-    id = "llm_output_box",
-    style = "
-      background: #f8f9fa;
-      border: 1px solid #d0d4d9;
-      border-radius: 8px;
-      padding: 12px;
-      max-height: 250px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      margin-bottom: 15px;
-    ",
-    verbatimTextOutput("p2_llm_preview")
-  ),
+  h4("Tentativa de informe generado:"),
+
+div(
+  id = "llm_output_box",
+  style = "
+    background: #f8f9fa;
+    border: 1px solid #d0d4d9;
+    border-radius: 8px;
+    padding: 12px;
+    max-height: 250px;
+    overflow-y: auto;          /* solo scroll vertical */
+    overflow-x: hidden;        /* sin scroll horizontal */
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    margin-bottom: 15px;
+    max-width: 650px;          /* NO ocupe todo el ancho */
+  ",
+  
+  # 🔧 Forzamos que el <pre> interno haga saltos de línea
+  tags$style("
+    #llm_output_box pre {
+      white-space: pre-wrap;   /* permite saltos de línea */
+      word-break: break-word;  /* parte palabras muy largas si hace falta */
+    }
+  "),
+  
+  verbatimTextOutput("p2_llm_preview")
+),
 
   # Botón de descarga (se mostrará solo cuando haya texto)
   shinyjs::hidden(
