@@ -192,6 +192,21 @@ output$header_help_button <- renderUI({
   )
 })
 
+  # -------------------------------------------------------------------
+  # Helper: validar que haya datos y que la variable sea numérica
+  # -------------------------------------------------------------------
+  .need_numeric <- function(df, var) {
+    validate(
+      need(!is.null(df) && nrow(df) > 0,
+           "Debe cargar un archivo de datos antes de continuar."),
+      need(!is.null(var) && nzchar(var) && var %in% names(df),
+           "Debe seleccionar una variable disponible en el archivo."),
+      need(is.numeric(df[[var]]),
+           "La variable seleccionada debe ser numérica.")
+    )
+    invisible(TRUE)
+  }
+
 # ============================================================
 # 🟢 Modal de ayuda dependiendo del módulo actual
 #     - p1  → guía COMPLETA (tu versión original, intacta)
