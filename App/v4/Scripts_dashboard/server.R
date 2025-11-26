@@ -1502,128 +1502,128 @@ output$downloadReport3 <- downloadHandler(
   }
 )
 
-  # =====================================================================
-  # 3.5 Informe automatizado LES (LLM)
-  # =====================================================================
+# =====================================================================
+# 3.5 Informe automatizado LES (LLM)
+# =====================================================================
 
-  # Texto generado por el modelo para LES
-  p4_llm_text <- reactiveVal("")
+# Texto generado por el modelo para LES
+p4_llm_text <- reactiveVal("")
 
-  observeEvent(input$p4_llm_generate, {
-    # Necesitamos datos, variable numérica y una muestra ya calculada
-    req(data3(), input$variable3, rv$sample_size_les, rv$muestra_les)
-    .need_numeric(data3(), input$variable3)
+observeEvent(input$p4_llm_generate, {
+  # Necesitamos datos, variable numérica y una muestra ya calculada
+  req(data3(), input$variable3, rv$sample_size_les, rv$muestra_les)
+  .need_numeric(data3(), input$variable3)
 
-    var_name   <- input$variable3
-    file_name  <- input$file3$name
-    les_value  <- input$LES
-    v_poblacion <- data3()[[var_name]]
-    v_muestra   <- rv$muestra_les[[var_name]]
+  var_name    <- input$variable3
+  file_name   <- input$file3$name
+  les_value   <- input$LES
+  v_poblacion <- data3()[[var_name]]
+  v_muestra   <- rv$muestra_les[[var_name]]
 
-    # Resumen cuantitativo para alimentar al LLM
-    resumen <- paste0(
-      "Archivo analizado: ", file_name, ".\n",
-      "Variable monetaria utilizada para el muestreo: ", var_name, ".\n",
-      "Número total de partidas en la población: ", sum(!is.na(v_poblacion)), ".\n",
-      "Importe total de la población (suma de la variable): ",
-      round(sum(v_poblacion, na.rm = TRUE), 2), ".\n",
-      "Tamaño de muestra obtenido: ", rv$sample_size_les, " partidas.\n",
-      "Valor LES utilizado: ", les_value, ".\n",
-      "Parámetros del plan de muestreo: \n",
-      "  - Error tolerable: ", input$freq1_LES, "\n",
-      "  - Error esperado: ", input$freq2_LES, "\n",
-      "  - Nivel de confianza: ", input$freq3_LES, "\n",
-      "  - Distribución asumida: ", input$distri_2, "\n",
-      "En la muestra LES se obtuvieron ", sum(v_muestra > les_value, na.rm = TRUE),
-      " partidas por encima del LES y ",
-      sum(v_muestra <= les_value, na.rm = TRUE),
-      " por debajo o iguales al LES.\n"
-    )
-
-    # Contexto que escribe el auditor
-    contexto_usuario <- input$p4_llm_context
-    if (!nzchar(contexto_usuario)) {
-      contexto_usuario <- "El usuario no proporcionó contexto adicional.";
-    }
-
-    # Prompt completo para el modelo
-    prompt_llm <- paste0(
-      "Eres un auditor financiero especializado en muestreos de detalle ",
-      "mediante el método LES (Límite Específico de Selección).\n\n",
-      "Contexto general del encargo de auditoría:\n",
-      contexto_usuario, "\n\n",
-      "Resumen del diseño y resultados del muestreo LES:\n",
-      resumen, "\n",
-      "Con base en esta información, redacta un párrafo claro y conciso ",
-      "(entre 8 y 12 líneas) que describa:\n",
-      "- Cómo se diseñó el muestreo LES (parámetros clave y uso del umbral LES).\n",
-      "- Qué revelan los resultados sobre la concentración de montos y los saldos ",
-      "por encima del umbral.\n",
-      "- Implicaciones para la planificación de pruebas sustantivas y la evaluación ",
-      "del riesgo de incorrección material.\n\n",
-      "Escribe en español, en tono técnico pero entendible, sin viñetas ni listas."
-    )
-
-    withProgress(message = "Generando informe con LLM...", value = 0, {
-      # Llamada al helper que envía el prompt a Ollama
-      ans <- ollama_generate(prompt_llm)
-
-      p4_llm_text(ans)
-      output$p4_llm_preview <- renderText(ans)
-      shinyjs::show("p4_llm_docx")
-
-      incProgress(1)
-    })
-  })
-
-  # Descarga del informe LES generado por LLM en DOCX
-  output$p4_llm_docx <- downloadHandler(
-    filename = function() {
-      paste0("Informe_LLM_Muestreo_LES_", Sys.Date(), ".docx")
-    },
-    content = function(file) {
-      tryCatch({
-        req(p4_llm_text())
-        if (!requireNamespace("officer", quietly = TRUE)) {
-          stop("El paquete 'officer' es necesario para generar el DOCX.")
-        }
-
-        doc <- officer::read_docx() |>
-          officer::body_add_par(
-            "Informe automatizado - Muestreo LES",
-            style = "heading 1"
-          ) |>
-          officer::body_add_par(
-            paste("Archivo de datos:", input$file3$name),
-            style = "heading 2"
-          ) |>
-          officer::body_add_par(
-            paste("Variable utilizada en el muestreo:", input$variable3),
-            style = "heading 2"
-          ) |>
-          officer::body_add_par(
-            paste("Valor LES aplicado:", input$LES),
-            style = "Normal"
-          ) |>
-          officer::body_add_par(
-            "Conclusión generada con modelo de lenguaje (LLM):",
-            style = "heading 3"
-          ) |>
-          officer::body_add_par(p4_llm_text(), style = "Normal")
-
-        print(doc, target = file)
-      }, error = function(e) {
-        showNotification(
-          paste("No se pudo generar el DOCX (Informe LLM LES):", conditionMessage(e)),
-          type = "error", duration = 10
-        )
-        shiny::validate(
-          shiny::need(FALSE, "Fallo en la generación del informe LLM (LES).")
-        )
-      })
-    },
-    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  # Resumen cuantitativo para alimentar al LLM
+  resumen <- paste0(
+    "Archivo analizado: ", file_name, ".\n",
+    "Variable monetaria utilizada para el muestreo: ", var_name, ".\n",
+    "Número total de partidas en la población: ", sum(!is.na(v_poblacion)), ".\n",
+    "Importe total de la población (suma de la variable): ",
+    round(sum(v_poblacion, na.rm = TRUE), 2), ".\n",
+    "Tamaño de muestra obtenido: ", rv$sample_size_les, " partidas.\n",
+    "Valor LES utilizado: ", les_value, ".\n",
+    "Parámetros del plan de muestreo: \n",
+    "  - Error tolerable: ", input$freq1_LES, "\n",
+    "  - Error esperado: ", input$freq2_LES, "\n",
+    "  - Nivel de confianza: ", input$freq3_LES, "\n",
+    "  - Distribución asumida: ", input$distri_2, "\n",
+    "En la muestra LES se obtuvieron ", sum(v_muestra > les_value, na.rm = TRUE),
+    " partidas por encima del LES y ",
+    sum(v_muestra <= les_value, na.rm = TRUE),
+    " por debajo o iguales al LES.\n"
   )
+
+  # Contexto que escribe el auditor
+  contexto_usuario <- input$p4_llm_context
+  if (!nzchar(contexto_usuario)) {
+    contexto_usuario <- "El usuario no proporcionó contexto adicional."
+  }
+
+  # Prompt completo para el modelo
+  prompt_llm <- paste0(
+    "Eres un auditor financiero especializado en muestreos de detalle ",
+    "mediante el método LES (Límite Específico de Selección).\n\n",
+    "Contexto general del encargo de auditoría:\n",
+    contexto_usuario, "\n\n",
+    "Resumen del diseño y resultados del muestreo LES:\n",
+    resumen, "\n",
+    "Con base en esta información, redacta un párrafo claro y conciso ",
+    "(entre 8 y 12 líneas) que describa:\n",
+    "- Cómo se diseñó el muestreo LES (parámetros clave y uso del umbral LES).\n",
+    "- Qué revelan los resultados sobre la concentración de montos y los saldos ",
+    "por encima del umbral.\n",
+    "- Implicaciones para la planificación de pruebas sustantivas y la evaluación ",
+    "del riesgo de incorrección material.\n\n",
+    "Escribe en español, en tono técnico pero entendible, sin viñetas ni listas."
+  )
+
+  withProgress(message = "Generando informe con LLM...", value = 0, {
+    # 🔁 Igual que en Descriptivo y MUM: usamos la MISMA función helper
+    ans <- ollama_generate(prompt_llm)
+
+    p4_llm_text(ans)
+    output$p4_llm_preview <- renderText(ans)
+    shinyjs::show("p4_llm_docx")
+
+    incProgress(1)
+  })
+})
+
+# Descarga del informe LES generado por LLM en DOCX
+output$p4_llm_docx <- downloadHandler(
+  filename = function() {
+    paste0("Informe_LLM_Muestreo_LES_", Sys.Date(), ".docx")
+  },
+  content = function(file) {
+    tryCatch({
+      req(p4_llm_text())
+      if (!requireNamespace("officer", quietly = TRUE)) {
+        stop("El paquete 'officer' es necesario para generar el DOCX.")
+      }
+
+      doc <- officer::read_docx() |>
+        officer::body_add_par(
+          "Informe automatizado - Muestreo LES",
+          style = "heading 1"
+        ) |>
+        officer::body_add_par(
+          paste("Archivo de datos:", input$file3$name),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          paste("Variable utilizada en el muestreo:", input$variable3),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          paste("Valor LES aplicado:", input$LES),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          "Conclusión generada con modelo de lenguaje (LLM):",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(p4_llm_text(), style = "Normal")
+
+      print(doc, target = file)
+    }, error = function(e) {
+      showNotification(
+        paste("No se pudo generar el DOCX (Informe LLM LES):", conditionMessage(e)),
+        type = "error", duration = 10
+      )
+      shiny::validate(
+        shiny::need(FALSE, "Fallo en la generación del informe LLM (LES).")
+      )
+    })
+  },
+  contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
 
   # =====================================================================
   # 4) MUESTREO POR ATRIBUTOS (p5)  - fileInput: file4
