@@ -39,9 +39,11 @@ if (os_name %in% c("Darwin", "Windows")) {
 # Incluye librerías de UI (Shiny), análisis estadístico,
 # visualización, manejo de datos y generación de reportes.
 # =========================================================
+
 .core <- c(
   # --- Sistema base y estructura de app ---
-  "here", "shiny", "shinydashboard", "shinydashboardPlus", "shinyWidgets",
+  "here", "shiny", "shinydashboard", "shinydashboardPlus",
+  "shinyWidgets", "shinyjs",
 
   # --- Manipulación y limpieza de datos ---
   "readxl", "readr", "openxlsx", "dplyr", "tidyr", "janitor",
@@ -58,8 +60,6 @@ if (os_name %in% c("Darwin", "Windows")) {
   "RcppRoll", "sunburstR", "d3r",
 
   # --- 🔁 Integración LLM (Ollama) + reportes DOCX ---
-  # httr2/jsonlite → llamadas HTTP y parseo JSON
-  # rmarkdown      → generación de Rmd / informes si se requiere
   "httr2", "jsonlite", "rmarkdown"
 )
 

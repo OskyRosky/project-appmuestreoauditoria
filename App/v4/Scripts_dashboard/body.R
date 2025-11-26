@@ -203,7 +203,7 @@ shinydashboard::tabItem(
   )
 ),
 
- #################################################################
+#################################################################
 #                           PÁG. p2                             #
 #                    📊 ANÁLISIS DESCRIPTIVO                    #
 #################################################################
@@ -281,7 +281,7 @@ shinydashboard::tabItem(
   # =====================================================
 
       # --- Informe automatizado (LLM) ---
-      h3("Informe automatizado (LLM)", align = "left"),
+      h3("Informe automatizado.", align = "left"),
       tags$p(
         "Opcionalmente, la aplicación puede redactar un informe breve y conclusivo ",
         "sobre los resultados descriptivos utilizando un modelo de lenguaje (LLM)."
@@ -302,16 +302,32 @@ shinydashboard::tabItem(
       ),
       br(), br(),
 
-      h4("Borrador de informe generado:"),
-      verbatimTextOutput("p2_llm_preview"),
+      h4("Tentativa de informe generado:"),
+      # Caja estilizada para mostrar el resultado del LLM
+  div(
+    id = "llm_output_box",
+    style = "
+      background: #f8f9fa;
+      border: 1px solid #d0d4d9;
+      border-radius: 8px;
+      padding: 12px;
+      max-height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin-bottom: 15px;
+    ",
+    verbatimTextOutput("p2_llm_preview")
+  ),
 
-      # Botón de descarga (se mostrará solo cuando haya texto)
-      shinyjs::hidden(
-        downloadButton(
-          outputId = "p2_llm_docx",
-          label    = "Descargar informe LLM (.docx)"
-        )
-      )
+  # Botón de descarga (se mostrará solo cuando haya texto)
+  shinyjs::hidden(
+    downloadButton(
+      outputId = "p2_llm_docx",
+      label    = "Descargar informe (.docx)"
+    )
+  )
 ),
 
     #################################################################

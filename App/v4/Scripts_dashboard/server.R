@@ -192,20 +192,50 @@ output$header_help_button <- renderUI({
   )
 })
 
-  # -------------------------------------------------------------------
-  # Helper: validar que haya datos y que la variable sea numérica
-  # -------------------------------------------------------------------
-  .need_numeric <- function(df, var) {
-    validate(
-      need(!is.null(df) && nrow(df) > 0,
-           "Debe cargar un archivo de datos antes de continuar."),
-      need(!is.null(var) && nzchar(var) && var %in% names(df),
-           "Debe seleccionar una variable disponible en el archivo."),
-      need(is.numeric(df[[var]]),
-           "La variable seleccionada debe ser numérica.")
-    )
-    invisible(TRUE)
-  }
+# -------------------------------------------------------------------
+# Helper: validar que haya datos y que la variable sea numérica
+# -------------------------------------------------------------------
+.need_numeric <- function(df, var) {
+  shiny::validate(
+    shiny::need(!is.null(df) && nrow(df) > 0,
+                "Debe cargar un archivo de datos antes de continuar."),
+    shiny::need(!is.null(var) && nzchar(var) && var %in% names(df),
+                "Debe seleccionar una variable disponible en el archivo."),
+    shiny::need(is.numeric(df[[var]]),
+                "La variable seleccionada debe ser numérica.")
+  )
+}
+
+# =========================================================
+# (7) Helper LLM: llamada a Ollama desde R
+# ---------------------------------------------------------
+# Usa variables de entorno si quieres cambiar modelo/host:
+#   OLLAMA_HOST  (ej. "http://localhost:11434")
+#   OLLAMA_MODEL (ej. "llama3.3:latest")
+# =========================================================
+ollama_generate <- function(prompt,
+                            model = Sys.getenv("OLLAMA_MODEL", "llama3.3:latest"),
+                            host  = Sys.getenv("OLLAMA_HOST",  "http://localhost:11434")) {
+
+  stopifnot(is.character(prompt), length(prompt) == 1)
+
+  url  <- paste0(host, "/api/generate")
+
+  body <- list(
+    model  = model,
+    prompt = prompt,
+    stream = FALSE
+  )
+
+  resp <- httr2::request(url) |>
+    httr2::req_body_json(body) |>
+    httr2::req_perform()
+
+  out <- httr2::resp_body_json(resp)
+
+  # En la API de Ollama, el texto viene en el campo "response"
+  out$response
+}
 
 # ============================================================
 # 🟢 Modal de ayuda dependiendo del módulo actual
@@ -815,6 +845,85 @@ output$downloadReport1 <- downloadHandler(
   }
 )
 
+
+  # ---- 1.6 Informe automatizado (LLM) -------------------------------
+  # Guardamos el texto generado por el modelo
+  p2_llm_text <- reactiveVal("")
+
+  observeEvent(input$p2_llm_generate, {
+    req(data1(), input$variable1)          # que haya datos y variable
+    .need_numeric(data1(), input$variable1)
+
+    # 1) Construir resumen numérico de la variable
+    var_name  <- input$variable1
+    file_name <- input$file1$name
+    v         <- data1()[[var_name]]
+
+    resumen <- paste0(
+      "Archivo analizado: ", file_name, ".\n",
+      "Variable: ", var_name, ".\n",
+      "Casos no faltantes: ", sum(!is.na(v)), ".\n",
+      "Mínimo: ", round(min(v, na.rm = TRUE), 2), ". ",
+      "Máximo: ", round(max(v, na.rm = TRUE), 2), ". ",
+      "Promedio: ", round(mean(v, na.rm = TRUE), 2), ". ",
+      "Mediana: ", round(median(v, na.rm = TRUE), 2), ". ",
+      "Desviación estándar: ", round(stats::sd(v, na.rm = TRUE), 2), ".\n",
+      "Percentiles (10, 25, 50, 75, 90): ",
+      paste(round(stats::quantile(v, probs = c(0.10,0.25,0.50,0.75,0.90), na.rm = TRUE), 2),
+            collapse = ", "),
+      "."
+    )
+
+    # 2) Contexto escrito por el usuario
+    contexto_usuario <- input$p2_llm_context
+    if (!nzchar(contexto_usuario)) {
+      contexto_usuario <- "El usuario no proporcionó contexto adicional."
+    }
+
+    # 3) Prompt para el LLM
+    prompt_llm <- paste0(
+      "Eres un auditor financiero que redacta conclusiones para papeles de trabajo.\n\n",
+      "Contexto general del encargo de auditoría:\n",
+      contexto_usuario, "\n\n",
+      "Resultados descriptivos de la variable analizada:\n",
+      resumen, "\n\n",
+      "Con base en esta información, redacta un párrafo claro y conciso (entre 8 y 12 líneas) ",
+      "que describa los principales hallazgos del análisis descriptivo, la concentración de montos, ",
+      "la presencia de valores extremos y cualquier aspecto relevante para la planificación de pruebas ",
+      "de auditoría. Escribe en español, en tono técnico pero entendible, evitando viñetas."
+    )
+
+    withProgress(message = "Generando informe con LLM...", value = 0, {
+      ans <- ollama_generate(prompt_llm)
+      p2_llm_text(ans)
+      output$p2_llm_preview <- renderText(ans)
+      shinyjs::show("p2_llm_docx")   # ahora sí mostramos el botón
+      incProgress(1)
+    })
+  })
+
+  # ---- 1.7 Descarga del informe LLM en .docx ------------------------
+  output$p2_llm_docx <- downloadHandler(
+    filename = function() {
+      paste0("Informe_LLM_Descriptivo_", Sys.Date(), ".docx")
+    },
+    content = function(file) {
+      req(p2_llm_text())
+      if (!requireNamespace("officer", quietly = TRUE)) {
+        stop("El paquete 'officer' es necesario para generar el DOCX.")
+      }
+
+      doc <- officer::read_docx() |>
+        officer::body_add_par("Informe automatizado - Análisis Descriptivo", style = "heading 1") |>
+        officer::body_add_par(paste("Archivo de datos:", input$file1$name), style = "heading 2") |>
+        officer::body_add_par(paste("Variable analizada:", input$variable1), style = "heading 2") |>
+        officer::body_add_par("Conclusión generada con modelo de lenguaje (LLM):", style = "heading 3") |>
+        officer::body_add_par(p2_llm_text(), style = "Normal")
+
+      print(doc, target = file)
+    },
+    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
   # =====================================================================
   # 2) MUESTREO MUM (p3)  - fileInput: file2
   # =====================================================================
