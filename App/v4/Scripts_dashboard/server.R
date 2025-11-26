@@ -1121,6 +1121,128 @@ output$downloadReport2 <- downloadHandler(
   }
 )
 
+# ---- 2.5 Informe automatizado MUM (LLM) -----------------------------
+p3_llm_text <- reactiveVal("")
+
+observeEvent(input$p3_llm_generate, {
+  # Debe existir: datos, variable, tamaño de muestra, muestra calculada
+  req(data2(), input$variable2, rv$sample_size_mum, rv$muestra_mum)
+  .need_numeric(data2(), input$variable2)
+
+  v          <- data2()[[input$variable2]]
+  var_name   <- input$variable2
+  file_name  <- input$file2$name
+  total_pop  <- sum(v, na.rm = TRUE)
+
+  # Resumen numérico del muestreo MUM
+  resumen_mum <- paste0(
+    "Archivo analizado: ", file_name, ".\n",
+    "Variable de muestreo: ", var_name, ".\n",
+    "Importe total de la población (suma de la variable): ", round(total_pop, 2), ".\n",
+    "Tamaño de la muestra MUM seleccionado: ", rv$sample_size_mum, " partidas.\n",
+    "Semilla utilizada para la selección PPT: ", rv$seed_mum, ".\n",
+    "Error tolerable: ", input$freq1_MUM, ".\n",
+    "Error esperado: ", input$freq2_MUM, ".\n",
+    "Nivel de confianza: ", input$freq3_MUM, ".\n",
+    "Distribución utilizada para la planificación: ", input$distri_1, "."
+  )
+
+  # Contexto escrito por el usuario
+  contexto_usuario <- input$p3_llm_context
+  if (!nzchar(contexto_usuario)) {
+    contexto_usuario <- "El usuario no proporcionó contexto adicional sobre el encargo de auditoría."
+  }
+
+  # Prompt específico para muestreo MUM
+  prompt_mum <- paste0(
+    "Eres un auditor financiero especializado en muestreo por unidades monetarias (MUM).\n\n",
+    "Contexto general del encargo de auditoría:\n",
+    contexto_usuario, "\n\n",
+    "Resultados clave del diseño y ejecución del muestreo MUM:\n",
+    resumen_mum, "\n\n",
+    "Con base en esta información, redacta un párrafo claro y conciso (entre 8 y 12 líneas) ",
+    "que describa los principales aspectos del muestreo: tamaño de la muestra, relación con el error ",
+    "tolerable y esperado, nivel de confianza, implicaciones para el riesgo de muestreo y cómo estos ",
+    "resultados orientan la planificación y extensión de las pruebas sustantivas. Escribe en español, ",
+    "en tono técnico pero entendible, sin viñetas y sin repetir literalmente los datos numéricos."
+  )
+
+  withProgress(message = "Generando informe con LLM (MUM)...", value = 0, {
+    ans <- ollama_generate(prompt_mum)
+    p3_llm_text(ans)
+    output$p3_llm_preview <- renderText(ans)
+    shinyjs::show("p3_llm_docx")
+    incProgress(1)
+  })
+})
+
+# ---- 2.6 Descarga del informe LLM MUM (.docx) ----------------------
+output$p3_llm_docx <- downloadHandler(
+  filename = function() {
+    paste0("Informe_LLM_MUM_", Sys.Date(), ".docx")
+  },
+  content = function(file) {
+    req(p3_llm_text())
+
+    if (!requireNamespace("officer", quietly = TRUE)) {
+      stop("El paquete 'officer' es necesario para generar el DOCX (MUM).")
+    }
+
+    doc <- officer::read_docx() |>
+      officer::body_add_par(
+        "Informe automatizado - Muestreo por Unidades Monetarias (MUM)",
+        style = "heading 1"
+      ) |>
+      officer::body_add_par(
+        paste("Archivo de datos:", input$file2$name),
+        style = "heading 2"
+      ) |>
+      officer::body_add_par(
+        paste("Variable de muestreo:", input$variable2),
+        style = "heading 2"
+      ) |>
+      officer::body_add_par(
+        "Parámetros principales del muestreo:",
+        style = "heading 3"
+      ) |>
+      officer::body_add_par(
+        paste("Error tolerable:", input$freq1_MUM),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Error esperado:", input$freq2_MUM),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Nivel de confianza:", input$freq3_MUM),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Distribución de planificación:", input$distri_1),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Tamaño de muestra MUM:", rv$sample_size_mum),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Semilla utilizada para PPT:", rv$seed_mum),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        "Conclusión generada con modelo de lenguaje (LLM):",
+        style = "heading 3"
+      ) |>
+      officer::body_add_par(
+        p3_llm_text(),
+        style = "Normal"
+      )
+
+    print(doc, target = file)
+  },
+  contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
+
   # =====================================================================
   # 3) MUESTREO LES (p4)  - fileInput: file3
   # =====================================================================

@@ -457,12 +457,75 @@ div(
       br(),
       actionButton("show1_MUM", "Descargar archivo"),
       br(),
-      h3("Descargar Reporte", align = "left"),
-      conditionalPanel(                                           # NEW
-        condition = "output.showDownloads",                       # NEW
-        downloadButton("downloadReport2", "Descargar Reporte Muestreo MUM")
-      )
-    ),
+      
+        h3("Descargar Reporte", align = "left"),
+  conditionalPanel(
+    condition = "output.showDownloads",
+    downloadButton("downloadReport2", "Descargar Reporte Muestreo MUM")
+  ),
+
+  br(), hr(),
+
+  # =====================================================
+  # 🧠 Informe automatizado (LLM) para Muestreo MUM
+  # =====================================================
+  h3("Informe automatizado (LLM)", align = "left"),
+  tags$p(
+    "Opcionalmente, la aplicación puede redactar un informe breve y conclusivo ",
+    "sobre los resultados del muestreo MUM utilizando un modelo de lenguaje (LLM)."
+  ),
+
+  # Contexto que el usuario aporta al modelo
+  textAreaInput(
+    inputId    = "p3_llm_context",
+    label      = "Explique la temática, la entidad o empresa auditada y el objetivo del muestreo MUM:",
+    placeholder = "Ejemplo: Muestreo por unidades monetarias de la cartera de créditos de un banco, para evaluar errores monetarios y apoyar la planificación de pruebas sustantivas.",
+    rows       = 4
+  ),
+
+  actionButton(
+    inputId = "p3_llm_generate",
+    label   = "Generar informe con LLM",
+    class   = "btn-success"
+  ),
+  br(), br(),
+
+  h4("Tentativa de informe generado:"),
+
+  # Caja estilizada para el texto del LLM
+  div(
+    id = "p3_llm_box",
+    style = "
+      background: #f8f9fa;
+      border: 1px solid #d0d4d9;
+      border-radius: 8px;
+      padding: 12px;
+      max-height: 250px;
+      overflow-y: auto;          /* solo scroll vertical */
+      overflow-x: hidden;        /* sin scroll horizontal */
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin-bottom: 15px;
+      max-width: 650px;
+    ",
+    # Forzar saltos de línea en el <pre> interno
+    tags$style("
+      #p3_llm_box pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    "),
+    verbatimTextOutput("p3_llm_preview")
+  ),
+
+  # Botón de descarga (solo se muestra cuando haya texto)
+  shinyjs::hidden(
+    downloadButton(
+      outputId = "p3_llm_docx",
+      label    = "Descargar informe LLM (.docx)"
+    )
+  )
+),
 
     #################################################################
     #                           PÁG. p4                             #
