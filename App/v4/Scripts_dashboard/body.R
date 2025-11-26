@@ -658,7 +658,7 @@ div(
       conditionalPanel(                                           # NEW
         condition = "output.showDownloads",                       # NEW
         downloadButton("downloadReport3", "Descargar Reporte Muestreo LES")
-      )
+      ),
 
       br(), hr(),
 
