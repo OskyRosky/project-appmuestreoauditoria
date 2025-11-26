@@ -653,11 +653,68 @@ div(
       br(),
       actionButton("show1_LES", "Descargar archivo"),
       br(),
+     
       h3("Descargar Reporte", align = "left"),
       conditionalPanel(                                           # NEW
         condition = "output.showDownloads",                       # NEW
         downloadButton("downloadReport3", "Descargar Reporte Muestreo LES")
       )
+
+      br(), hr(),
+
+      # =====================================================
+      # 🧠 Informe automatizado (LLM) - LES
+      # =====================================================
+      h3("Informe automatizado (LLM)", align = "left"),
+      tags$p(
+        "Opcionalmente, la aplicación puede redactar un informe breve y conclusivo ",
+        "sobre los resultados del muestreo LES utilizando un modelo de lenguaje (LLM)."
+      ),
+
+      # Contexto que el usuario aporta al modelo
+      textAreaInput(
+        inputId   = "p4_llm_context",
+        label     = "Explique la temática, la entidad o empresa auditada y el objetivo del muestreo LES:",
+        placeholder = "Ejemplo: Se realiza un muestreo LES sobre la cartera de préstamos del Banco X, para evaluar los saldos superiores a un umbral y apoyar la planificación de pruebas sustantivas.",
+        rows      = 4
+      ),
+
+      actionButton(
+        inputId = "p4_llm_generate",
+        label   = "Generar informe con LLM",
+        class   = "btn-success"
+      ),
+      br(), br(),
+
+      h4("Tentativa de informe generado:"),
+
+      # Caja estilizada para mostrar el resultado del LLM
+      div(
+        id = "p4_llm_output_box",
+        style = "
+          background: #f8f9fa;
+          border: 1px solid #d0d4d9;
+          border-radius: 8px;
+          padding: 12px;
+          max-height: 260px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          margin-bottom: 15px;
+          width: 70%;
+        ",
+        verbatimTextOutput("p4_llm_preview")
+      ),
+
+      # Botón de descarga (se mostrará solo cuando haya texto)
+      shinyjs::hidden(
+        downloadButton(
+          outputId = "p4_llm_docx",
+          label    = "Descargar informe LLM (.docx)"
+        )
+      )
+
     ),
 
     #################################################################
