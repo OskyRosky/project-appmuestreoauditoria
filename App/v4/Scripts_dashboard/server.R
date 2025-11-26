@@ -1746,9 +1746,13 @@ output$download5.3 <- downloadHandler(
       df <- .sanitize_for_xlsx(rv$muestra_atri)
       openxlsx::write.xlsx(df, file)
     }, error = function(e) {
-      showNotification(paste("No se pudo generar XLSX (Atributos):", conditionMessage(e)),
-                       type = "error", duration = 10)
-      validate(need(FALSE, "Fallo al generar XLSX (Atributos)."))
+      showNotification(
+        paste("No se pudo generar XLSX (Atributos):", conditionMessage(e)),
+        type = "error", duration = 10
+      )
+      shiny::validate(
+        shiny::need(FALSE, "Fallo al generar XLSX (Atributos).")
+      )
     })
   }
 )
@@ -1800,8 +1804,13 @@ output$download5.3 <- downloadHandler(
 
           print(doc, target = file)
         }, error = function(e) {
-          showNotification(paste("No se pudo generar el DOCX (Atributos):", conditionMessage(e)), type = "error", duration = 10)
-          validate(need(FALSE, "Fallo en la generación del reporte DOCX (Atributos)."))
+          showNotification(
+            paste("No se pudo generar el DOCX (Atributos):", conditionMessage(e)),
+            type = "error", duration = 10
+          )
+          shiny::validate(
+            shiny::need(FALSE, "Fallo en la generación del reporte DOCX (Atributos).")
+          )
         })
       }
     )
