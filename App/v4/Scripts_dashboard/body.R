@@ -843,7 +843,68 @@ div(
       conditionalPanel(                                           # NEW
         condition = "output.showDownloads",                       # NEW
         downloadButton("downloadReport4", "Descargar Reporte Muestreo Atributos")
+      ),
+      br(), hr(),
+
+      # =====================================================
+      # 🧠 Informe automatizado (LLM) - Atributos
+      # =====================================================
+      h3("Informe automatizado (LLM)", align = "left"),
+      tags$p(
+        "Opcionalmente, la aplicación puede redactar un informe breve y conclusivo ",
+        "sobre los resultados del muestreo Atributos utilizando un modelo de lenguaje (LLM)."
+      ),
+
+      # Contexto que el usuario aporta al modelo
+      textAreaInput(
+        inputId    = "p5_llm_context",
+        label      = "Explique la temática, la entidad o empresa auditada y el objetivo del muestreo de atributos:",
+        placeholder = "Ejemplo: Muestreo de atributos sobre expedientes de contratación, para evaluar el cumplimiento de requisitos formales y sustantivos.",
+        rows       = 4
+      ),
+
+      actionButton(
+        inputId = "p5_llm_generate",
+        label   = "Generar informe con LLM",
+        class   = "btn-success"
+      ),
+      br(), br(),
+
+      h4("Tentativa de informe generado:"),
+
+      # Caja estilizada para el texto del LLM (mismo estilo que MUM / LES)
+      div(
+        id = "p5_llm_box",
+        style = "
+          background: #f8f9fa;
+          border: 1px solid #d0d4d9;
+          border-radius: 8px;
+          padding: 12px;
+          max-height: 250px;
+          overflow-y: auto;          /* solo scroll vertical */
+          overflow-x: hidden;        /* sin scroll horizontal */
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          margin-bottom: 15px;
+          max-width: 650px;
+        ",
+        tags$style("
+          #p5_llm_box pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+          }
+        "),
+        verbatimTextOutput("p5_llm_preview")
+      ),
+
+      # Botón de descarga (solo visible cuando haya texto LLM)
+      shinyjs::hidden(
+        downloadButton(
+          outputId = "p5_llm_docx",
+          label    = "Descargar informe LLM (.docx)"
+        )
       )
+
     ),
 
     #################################################################

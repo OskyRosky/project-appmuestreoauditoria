@@ -1816,6 +1816,130 @@ output$download5.3 <- downloadHandler(
     )
   }) # /observeEvent(update_Atri)
 
+   # =====================================================================
+  # 4.3 Informe automatizado Atributos (LLM)
+  # =====================================================================
+
+  p5_llm_text <- reactiveVal("")
+
+  observeEvent(input$p5_llm_generate, {
+    # Necesitamos datos, variable seleccionada y muestra ya calculada
+    req(data4(), input$variable4, rv$sample_size_atri, rv$muestra_atri)
+
+    var_name  <- input$variable4
+    file_name <- input$file4$name
+
+    # Población
+    v_poblacion <- data4()[[var_name]]
+    n_poblacion <- sum(!is.na(v_poblacion))
+
+    # Tabla de porcentajes en población
+    origen <- data4() |>
+      dplyr::group_by(Categoria = .data[[var_name]]) |>
+      dplyr::tally(name = "Total") |>
+      dplyr::mutate(Porcentaje = round((Total / sum(Total)) * 100, 1)) |>
+      dplyr::ungroup()
+
+    # Tabla de porcentajes en muestra
+    muestra <- rv$muestra_atri |>
+      dplyr::group_by(Categoria = .data[[var_name]]) |>
+      dplyr::tally(name = "Total") |>
+      dplyr::mutate(Porcentaje = round((Total / sum(Total)) * 100, 1)) |>
+      dplyr::ungroup()
+
+    # Un pequeño resumen textual para el modelo
+    resumen <- paste0(
+      "Archivo analizado: ", file_name, ".\n",
+      "Variable de atributo utilizada en el muestreo: ", var_name, ".\n",
+      "Número total de partidas en la población: ", n_poblacion, ".\n",
+      "Tamaño de muestra obtenido: ", rv$sample_size_atri, " partidas.\n",
+      "Parámetros del plan de muestreo:\n",
+      "  - Tasa de desviación tolerable: ", input$freq1_Atri, "\n",
+      "  - Tasa de desviación esperada: ", input$freq2_Atri, "\n",
+      "  - Nivel de confianza: ", input$freq3_Atri, "\n",
+      "  - Distribución asumida: ", input$distri_3, "\n"
+    )
+
+    # Resumen de categorías
+    resumen_cat_pob <- paste0(
+      "Distribución en la población (porcentaje por categoría):\n",
+      paste0("  - ", origen$Categoria, ": ", origen$Porcentaje, "%", collapse = "\n"), "\n"
+    )
+
+    resumen_cat_muestra <- paste0(
+      "Distribución en la muestra (porcentaje por categoría):\n",
+      paste0("  - ", muestra$Categoria, ": ", muestra$Porcentaje, "%", collapse = "\n"), "\n"
+    )
+
+    # Contexto del usuario
+    contexto_usuario <- input$p5_llm_context
+    if (!nzchar(contexto_usuario)) {
+      contexto_usuario <- "El usuario no proporcionó contexto adicional."
+    }
+
+    # Prompt final para el LLM (usando el helper .ollama_generate)
+    prompt_llm <- paste0(
+      "Eres un auditor financiero especializado en muestreo de atributos.\n\n",
+      "Contexto general del encargo de auditoría:\n",
+      contexto_usuario, "\n\n",
+      "Resumen del diseño y resultados del muestreo de atributos:\n",
+      resumen, "\n",
+      resumen_cat_pob, "\n",
+      resumen_cat_muestra, "\n",
+      "Con base en esta información, redacta un párrafo claro y conciso ",
+      "(entre 8 y 12 líneas) que describa:\n",
+      "- Cómo se diseñó el muestreo de atributos (parámetros clave).\n",
+      "- Qué revelan los resultados sobre la tasa de desviaciones y la ",
+      "comparación entre población y muestra.\n",
+      "- Implicaciones para la planificación de pruebas sustantivas y la ",
+      "evaluación del riesgo de incumplimiento.\n\n",
+      "Escribe en español, en tono técnico pero entendible, sin viñetas ni listas."
+    )
+
+    withProgress(message = "Generando informe con LLM...", value = 0, {
+      ans <- .ollama_generate(prompt_llm)   # usa el mismo helper que en MUM y LES
+
+      p5_llm_text(ans)
+      output$p5_llm_preview <- renderText(ans)
+      shinyjs::show("p5_llm_docx")
+
+      incProgress(1)
+    })
+  })
+
+  # Descarga del informe LLM Atributos en DOCX
+  output$p5_llm_docx <- downloadHandler(
+    filename = function() {
+      paste0("Informe_LLM_Muestreo_Atributos_", Sys.Date(), ".docx")
+    },
+    content = function(file) {
+      tryCatch({
+        req(p5_llm_text())
+        if (!requireNamespace("officer", quietly = TRUE)) {
+          stop("El paquete 'officer' es necesario para generar el DOCX.")
+        }
+
+        doc <- officer::read_docx() |>
+          officer::body_add_par("Informe automatizado - Muestreo Atributos", style = "heading 1") |>
+          officer::body_add_par(paste("Archivo de datos:", input$file4$name), style = "heading 2") |>
+          officer::body_add_par(paste("Variable de atributo utilizada:", input$variable4), style = "heading 2") |>
+          officer::body_add_par("Conclusión generada con modelo de lenguaje (LLM):", style = "heading 3") |>
+          officer::body_add_par(p5_llm_text(), style = "Normal")
+
+        print(doc, target = file)
+      }, error = function(e) {
+        showNotification(
+          paste("No se pudo generar el DOCX (Informe LLM Atributos):", conditionMessage(e)),
+          type = "error", duration = 10
+        )
+        shiny::validate(
+          shiny::need(FALSE, "Fallo en la generación del informe LLM (Atributos).")
+        )
+      })
+    },
+    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) 
+
   # =====================================================================
   # 5) EVALUACIÓN (p6)  - fileInput: file5
   # =====================================================================
