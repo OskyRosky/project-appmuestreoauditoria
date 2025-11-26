@@ -279,59 +279,39 @@ shinydashboard::tabItem(
   # =====================================================
   # 🧠 NUEVO BLOQUE: Informe automatizado con LLM
   # =====================================================
-  h3("Informe automatizado (LLM)", align = "left"),
-  helpText(
-    "Opcionalmente, la aplicación puede redactar un informe breve ",
-    "conclusivo sobre los resultados descriptivos utilizando un modelo de lenguaje (LLM)."
-  ),
 
-  # 1) Pregunta de activación
-  radioButtons(
-    inputId = "want_llm_desc",
-    label   = "¿Desea que se genere un informe redactado para papeles de trabajo?",
-    choices = c("No por el momento" = "no", "Sí, generar informe con LLM" = "si"),
-    selected = "no",
-    inline = FALSE
-  ),
-
-  # 2) Contenido visible solo si el usuario elige "sí"
-  conditionalPanel(
-    condition = "input.want_llm_desc == 'si'",
-
-    br(),
-    # 👉 Campo de contexto que alimentará al LLM
-    textAreaInput(
-      inputId = "llm_desc_context",
-      label   = "Explique la temática, la entidad o empresa auditada y el objetivo del análisis descriptivo:",
-      placeholder = paste(
-        "Ejemplo: Análisis descriptivo de la cartera de cuentas por cobrar del Ministerio X,",
-        "para evaluar concentración de saldos y apoyar la planificación de pruebas sustantivas."
+      # --- Informe automatizado (LLM) ---
+      h3("Informe automatizado (LLM)", align = "left"),
+      tags$p(
+        "Opcionalmente, la aplicación puede redactar un informe breve y conclusivo ",
+        "sobre los resultados descriptivos utilizando un modelo de lenguaje (LLM)."
       ),
-      rows = 4
-    ),
 
-    br(),
-    actionButton(
-      inputId = "btn_llm_desc_generate",
-      label   = "Generar informe con LLM",
-      class   = "btn-success"
-    ),
-    br(), br(),
+      # Contexto que el usuario aporta al modelo
+      textAreaInput(
+        inputId   = "p2_llm_context",
+        label     = "Explique la temática, la entidad o empresa auditada y el objetivo del análisis descriptivo:",
+        placeholder = "Ejemplo: Análisis descriptivo de la cartera de cuentas por cobrar del Ministerio X, para evaluar concentración de saldos y apoyar la planificación de pruebas sustantivas.",
+        rows      = 4
+      ),
 
-    # Estado / mensajes (lo llenaremos en server.R)
-    textOutput("llm_desc_status"),
-    br(),
+      actionButton(
+        inputId = "p2_llm_generate",
+        label   = "Generar informe con LLM",
+        class   = "btn-success"
+      ),
+      br(), br(),
 
-    h4("Borrador de informe generado:", align = "left"),
-    verbatimTextOutput("llm_desc_preview"),
+      h4("Borrador de informe generado:"),
+      verbatimTextOutput("p2_llm_preview"),
 
-    br(),
-    # Botón para descargar el informe LLM en DOCX
-    downloadButton(
-      outputId = "download_llm_desc_docx",
-      label    = "Descargar informe LLM (.docx)"
-    )
-  )
+      # Botón de descarga (se mostrará solo cuando haya texto)
+      shinyjs::hidden(
+        downloadButton(
+          outputId = "p2_llm_docx",
+          label    = "Descargar informe LLM (.docx)"
+        )
+      )
 ),
 
     #################################################################
