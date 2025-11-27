@@ -1,54 +1,43 @@
-# Imagen base con R (sin shiny-server, nosotros lanzamos la app a mano)
-FROM rocker/r-ver:4.4.2
+# Imagen base con R + Shiny Server
+FROM rocker/shiny:4.4.1
 
-# ─────────────────────────────────────────────
-# 1. Paquetes del sistema necesarios para R y librerías "pesadas"
-# ─────────────────────────────────────────────
+# Evitar prompts interactivos
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Dependencias del sistema
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
     libfontconfig1-dev \
-    libfreetype6-dev \
-    libpng-dev \
-    libtiff5-dev \
-    libjpeg-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    libmagick++-dev \
-    libpoppler-cpp-dev \
-    ghostscript \
+    libxt-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# ─────────────────────────────────────────────
-# 2. Copiar tu app dentro del contenedor
-# ─────────────────────────────────────────────
-WORKDIR /srv/app
-COPY . /srv/app
+# Instalar los paquetes que usa la app
+RUN R -e "install.packages(c( \
+  'shiny', \
+  'shinydashboard', \
+  'shinyjs', \
+  'reactable', \
+  'highcharter', \
+  'openxlsx', \
+  'officer', \
+  'flextable', \
+  'ggplot2', \
+  'dplyr', \
+  'readxl', \
+  'httr', \
+  'jsonlite' \
+), repos = 'https://cloud.r-project.org')"
 
-# ─────────────────────────────────────────────
-# 3. Variables de entorno de la app
-# ─────────────────────────────────────────────
-# APP_BOOTSTRAP: fuerza instalación de librerías en build
-# APP_HEAVY: instala también officer, flextable, magick, etc.
-# APP_HOST/APP_PORT: usados por AppAuditSample.R
-ENV APP_BOOTSTRAP=TRUE \
-    APP_HEAVY=TRUE \
-    APP_HOST=0.0.0.0 \
-    APP_PORT=8000
+# Directorio donde Shiny Server sirve apps
+WORKDIR /srv/shiny-server/
 
-# ─────────────────────────────────────────────
-# 4. Pre-instalar todas las librerías R usando tu propio bootstrap
-# ─────────────────────────────────────────────
-# Esto ejecuta Librerias.R dentro de Scripts_dashboard y deja todo instalado.
-RUN R -q -e "source('Scripts_dashboard/Librerias.R')"
+# Copiar pasta completa (la app Shiny)
+COPY . /srv/shiny-server/
 
-# ─────────────────────────────────────────────
-# 5. Exponer el puerto donde corre Shiny
-# ─────────────────────────────────────────────
-EXPOSE 8000
+# Exponer puerto 3838 (Shiny Server)
+EXPOSE 3838
 
-# ─────────────────────────────────────────────
-# 6. Comando por defecto: lanzar tu app
-# ─────────────────────────────────────────────
-CMD ["R","-q","-f","AppAuditSample.R"]
+# Comando que corre shiny-server
+CMD ["/usr/bin/shiny-server"]
