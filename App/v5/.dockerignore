@@ -5,8 +5,8 @@
 .git
 .gitignore
 *.Rproj
-
 data/raw/*
-Respaldo/*
-Pruebas/*
-LLM-R/*
+Respaldo/
+Pruebas/
+Read me.pdf
+Read me.docx
