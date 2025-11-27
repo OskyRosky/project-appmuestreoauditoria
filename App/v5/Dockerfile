@@ -1,10 +1,10 @@
-# Imagen base con R + Shiny Server
+# Imagen base con R + Shiny Server (incluye R y shiny-server ya configurado)
 FROM rocker/shiny:4.4.1
 
-# Evitar prompts interactivos
+# Para evitar prompts interactivos en la instalación
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Dependencias del sistema
+# Paquetes del sistema que algunas libs de R necesitan
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libxt-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar los paquetes que usa la app
+# Instalar los paquetes de R necesarios para la app
 RUN R -e "install.packages(c( \
   'shiny', \
   'shinydashboard', \
@@ -27,17 +27,21 @@ RUN R -e "install.packages(c( \
   'dplyr', \
   'readxl', \
   'httr', \
-  'jsonlite' \
+  'jsonlite', \
+  'tidyr' \
 ), repos = 'https://cloud.r-project.org')"
 
-# Directorio donde Shiny Server sirve apps
+# Si usas un paquete específico para `planning()` (por ejemplo 'audit'),
+# descomenta esta línea:
+# RUN R -e "install.packages('audit', repos = 'https://cloud.r-project.org')"
+
+# Copiar TODO el contenido de v5 dentro de una subcarpeta 'app'
+# Shiny Server servirá esta app en /app
 WORKDIR /srv/shiny-server/
+COPY . /srv/shiny-server/app
 
-# Copiar pasta completa (la app Shiny)
-COPY . /srv/shiny-server/
-
-# Exponer puerto 3838 (Shiny Server)
+# Exponer el puerto que usa shiny-server
 EXPOSE 3838
 
-# Comando que corre shiny-server
+# Comando por defecto: lanzar shiny-server
 CMD ["/usr/bin/shiny-server"]
