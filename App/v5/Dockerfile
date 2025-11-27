@@ -1,47 +1,43 @@
-# Imagen base con R + Shiny Server (incluye R y shiny-server ya configurado)
-FROM rocker/shiny:4.4.1
+# Dockerfile para AppAuditSampleLLM (v5)
 
-# Para evitar prompts interactivos en la instalación
+# 1. Imagen base con R (nosotros lanzamos la app, sin shiny-server)
+FROM rocker/r-ver:4.4.2
+
+# 2. Evitar prompts interactivos en las instalaciones
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Paquetes del sistema que algunas libs de R necesitan
+# 3. Paquetes de sistema necesarios para R y librerías "pesadas"
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
     libfontconfig1-dev \
-    libxt-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libmagick++-dev \
+    libpoppler-cpp-dev \
+    ghostscript \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar los paquetes de R necesarios para la app
-RUN R -e "install.packages(c( \
-  'shiny', \
-  'shinydashboard', \
-  'shinyjs', \
-  'reactable', \
-  'highcharter', \
-  'openxlsx', \
-  'officer', \
-  'flextable', \
-  'ggplot2', \
-  'dplyr', \
-  'readxl', \
-  'httr', \
-  'jsonlite', \
-  'tidyr' \
-), repos = 'https://cloud.r-project.org')"
+# 4. Copiar TODO el proyecto (AppAuditSample.R, www, data, Scripts_dashboard, LLM-R, etc.)
+WORKDIR /srv/AppAuditSampleLLM
+COPY . /srv/AppAuditSampleLLM
 
-# Si usas un paquete específico para `planning()` (por ejemplo 'audit'),
-# descomenta esta línea:
-# RUN R -e "install.packages('audit', repos = 'https://cloud.r-project.org')"
+# 5. Variables de entorno usadas por Librerias.R y AppAuditSample.R
+ENV APP_BOOTSTRAP=TRUE \
+    APP_HEAVY=TRUE \
+    APP_HOST=0.0.0.0 \
+    APP_PORT=8001
 
-# Copiar TODO el contenido de v5 dentro de una subcarpeta 'app'
-# Shiny Server servirá esta app en /app
-WORKDIR /srv/shiny-server/
-COPY . /srv/shiny-server/app
+# 6. Pre-instalar todas las librerías R usando tu script de bootstrap
+RUN R -q -e "source('Scripts_dashboard/Librerias.R')"
 
-# Exponer el puerto que usa shiny-server
-EXPOSE 3838
+# 7. Exponer el puerto interno donde correrá Shiny
+EXPOSE 8001
 
-# Comando por defecto: lanzar shiny-server
-CMD ["/usr/bin/shiny-server"]
+# 8. Comando por defecto: lanzar tu app de muestreo con LLM
+CMD ["R","-q","-f","AppAuditSample.R"]
