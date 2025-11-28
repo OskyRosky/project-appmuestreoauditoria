@@ -4,25 +4,13 @@
 # Este script asegura que todas las librerías
 # necesarias estén instaladas y cargadas antes
 # de ejecutar la App de Muestreo de Auditoría.
-#
-# Funciones clave:
-#   • Verifica qué paquetes están instalados.
-#   • Instala automáticamente los que falten.
-#   • Permite forzar reinstalación con una variable
-#     de entorno (APP_BOOTSTRAP=TRUE).
-#   • Carga silenciosamente todos los paquetes.
-#   • Muestra la raíz del proyecto detectada por {here}.
 ###############################################
 
 # =========================================================
 # (0) Configuración del mirror CRAN
-# ---------------------------------------------------------
-# Evita el prompt interactivo al instalar paquetes y
-# garantiza consistencia entre entornos Windows/Mac/Linux.
 # =========================================================
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
-# Elegir tipo de paquete según SO:
 os_name <- Sys.info()[["sysname"]]
 
 if (os_name %in% c("Darwin", "Windows")) {
@@ -35,9 +23,6 @@ if (os_name %in% c("Darwin", "Windows")) {
 
 # =========================================================
 # (1) Listado de dependencias de la App
-# ---------------------------------------------------------
-# Incluye librerías de UI (Shiny), análisis estadístico,
-# visualización, manejo de datos y generación de reportes.
 # =========================================================
 
 .core <- c(
@@ -63,7 +48,6 @@ if (os_name %in% c("Darwin", "Windows")) {
   "httr2", "jsonlite", "rmarkdown"
 )
 
-# Paquetes “pesados” que requieren librerías nativas del sistema (macOS/Linux)
 .heavy <- c(
   # --- Reportes en Word y tablas ricas ---
   "kableExtra", "officer", "flextable",
@@ -74,17 +58,14 @@ if (os_name %in% c("Darwin", "Windows")) {
 )
 
 # =========================================================
-# (2) Variables de control
-# ---------------------------------------------------------
-# APP_BOOTSTRAP = TRUE → fuerza reinstalación.
-# APP_HEAVY = TRUE → incluye paquetes pesados.
+# (2) Variables de control (desde entorno)
 # =========================================================
-.force_install  <- isTRUE(as.logical(Sys.getenv("APP_BOOTSTRAP", "FALSE")))
-.install_heavy  <- isTRUE(as.logical(Sys.getenv("APP_HEAVY", "FALSE")))
+bootstrap_flag <- Sys.getenv("APP_BOOTSTRAP", "FALSE")
+heavy_flag     <- Sys.getenv("APP_HEAVY",     "FALSE")
 
 # =========================================================
-# (3) Función para instalar paquetes faltantes
-# ---------------------------------------------------------
+# (3) Helpers de instalación / carga
+# =========================================================
 .instalar_si_faltan <- function(pkgs, force = FALSE) {
   ya_instalados <- rownames(installed.packages())
   faltan <- if (force) pkgs else setdiff(pkgs, ya_instalados)
@@ -94,9 +75,6 @@ if (os_name %in% c("Darwin", "Windows")) {
   }
 }
 
-# =========================================================
-# (4) Función para cargar librerías silenciosamente
-# ---------------------------------------------------------
 .cargar_todos <- function(pkgs) {
   invisible(lapply(
     pkgs,
@@ -108,29 +86,34 @@ if (os_name %in% c("Darwin", "Windows")) {
 }
 
 # =========================================================
-# (5) Ejecutar el bootstrap de dependencias
-# ---------------------------------------------------------
-# Instala (si falta) y luego carga todas las librerías base.
+# (4) Bootstrap según APP_BOOTSTRAP
 # =========================================================
-.instalar_si_faltan(.core, force = .force_install)
+if (identical(bootstrap_flag, "TRUE")) {
+  message("🚀 Modo BOOTSTRAP (APP_BOOTSTRAP=TRUE): instalando y cargando paquetes .core")
+  .instalar_si_faltan(.core, force = TRUE)
+} else {
+  message("⚙️  Modo RUNTIME (APP_BOOTSTRAP=FALSE): solo se verifica y cargan paquetes .core")
+  .instalar_si_faltan(.core, force = FALSE)
+}
+
 .cargar_todos(.core)
 
-# --- (5.1) Cargar paquetes pesados solo si APP_HEAVY=TRUE ---
-if (.install_heavy) {
-  try({
-    .instalar_si_faltan(.heavy, force = .force_install)
-    .cargar_todos(.heavy)
-    message("✅ Paquetes pesados cargados correctamente.")
-  }, silent = TRUE)
+# --- (4.1) Paquetes pesados solo si APP_HEAVY=TRUE ---
+if (identical(heavy_flag, "TRUE")) {
+  message("💪 APP_HEAVY=TRUE → incluyendo paquetes pesados")
+  if (identical(bootstrap_flag, "TRUE")) {
+    .instalar_si_faltan(.heavy, force = TRUE)
+  } else {
+    .instalar_si_faltan(.heavy, force = FALSE)
+  }
+  .cargar_todos(.heavy)
+  message("✅ Paquetes pesados cargados correctamente.")
 } else {
-  message("ℹ️ Paquetes pesados omitidos (usa APP_HEAVY=TRUE para incluirlos).")
+  message("ℹ️ APP_HEAVY=FALSE → paquetes pesados omitidos.")
 }
 
 # =========================================================
-# (6) Información del entorno
-# ---------------------------------------------------------
-# Carga {here} y muestra la raíz del proyecto detectada.
-# Esto facilita trazabilidad y validación de rutas.
+# (5) Información del entorno
 # =========================================================
 suppressMessages(library(here))
 cat("\n✅ Librerías listas y entorno inicializado correctamente.\n")
