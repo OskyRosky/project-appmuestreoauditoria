@@ -213,6 +213,10 @@ output$header_help_button <- renderUI({
 #   OLLAMA_HOST  (ej. "http://localhost:11434")
 #   OLLAMA_MODEL (ej. "llama3.3:latest")
 # =========================================================
+# =========================================================
+# Helper central para hablar con Ollama desde Shiny
+# =========================================================
+
 ollama_generate <- function(prompt,
                             model = Sys.getenv("OLLAMA_MODEL", "llama3.3:latest"),
                             host  = Sys.getenv("OLLAMA_HOST",  "http://localhost:11434")) {
@@ -233,8 +237,26 @@ ollama_generate <- function(prompt,
 
   out <- httr2::resp_body_json(resp)
 
-  # En la API de Ollama, el texto viene en el campo "response"
   out$response
+}
+
+# =========================================================
+# Wrapper seguro para usar dentro de observeEvent en Shiny
+# =========================================================
+.safe_ollama_call <- function(prompt) {
+  tryCatch(
+    {
+      ollama_generate(prompt)
+    },
+    error = function(e) {
+      shiny::showNotification(
+        paste("Error al consultar el modelo LLM:", conditionMessage(e)),
+        type = "error",
+        duration = 10
+      )
+      return(NULL)
+    }
+  )
 }
 
 # ============================================================
@@ -677,7 +699,6 @@ observeEvent(input$welcome_guide, {
 
 })
 
-
   # ============================================================
   #  🌗 Modo oscuro: envía el estado al frontend (JS)
   # ============================================================
@@ -846,61 +867,79 @@ output$downloadReport1 <- downloadHandler(
 )
 
 
-  # ---- 1.6 Informe automatizado (LLM) -------------------------------
-  # Guardamos el texto generado por el modelo
-  p2_llm_text <- reactiveVal("")
+# ---- 1.6 Informe automatizado (LLM) -------------------------------
+# Guardamos el texto generado por el modelo
+p2_llm_text <- reactiveVal("")
 
-  observeEvent(input$p2_llm_generate, {
-    req(data1(), input$variable1)          # que haya datos y variable
-    .need_numeric(data1(), input$variable1)
+observeEvent(input$p2_llm_generate, {
+  req(data1(), input$variable1)          # que haya datos y variable
+  .need_numeric(data1(), input$variable1)
 
-    # 1) Construir resumen numérico de la variable
-    var_name  <- input$variable1
-    file_name <- input$file1$name
-    v         <- data1()[[var_name]]
+  # 1) Construir resumen numérico de la variable
+  var_name  <- input$variable1
+  file_name <- input$file1$name
+  v         <- data1()[[var_name]]
 
-    resumen <- paste0(
-      "Archivo analizado: ", file_name, ".\n",
-      "Variable: ", var_name, ".\n",
-      "Casos no faltantes: ", sum(!is.na(v)), ".\n",
-      "Mínimo: ", round(min(v, na.rm = TRUE), 2), ". ",
-      "Máximo: ", round(max(v, na.rm = TRUE), 2), ". ",
-      "Promedio: ", round(mean(v, na.rm = TRUE), 2), ". ",
-      "Mediana: ", round(median(v, na.rm = TRUE), 2), ". ",
-      "Desviación estándar: ", round(stats::sd(v, na.rm = TRUE), 2), ".\n",
-      "Percentiles (10, 25, 50, 75, 90): ",
-      paste(round(stats::quantile(v, probs = c(0.10,0.25,0.50,0.75,0.90), na.rm = TRUE), 2),
-            collapse = ", "),
-      "."
+  resumen <- paste0(
+    "Archivo analizado: ", file_name, ".\n",
+    "Variable: ", var_name, ".\n",
+    "Casos no faltantes: ", sum(!is.na(v)), ".\n",
+    "Mínimo: ", round(min(v, na.rm = TRUE), 2), ". ",
+    "Máximo: ", round(max(v, na.rm = TRUE), 2), ". ",
+    "Promedio: ", round(mean(v, na.rm = TRUE), 2), ". ",
+    "Mediana: ", round(median(v, na.rm = TRUE), 2), ". ",
+    "Desviación estándar: ", round(stats::sd(v, na.rm = TRUE), 2), ".\n",
+    "Percentiles (10, 25, 50, 75, 90): ",
+    paste(round(stats::quantile(v, probs = c(0.10,0.25,0.50,0.75,0.90), na.rm = TRUE), 2),
+          collapse = ", "),
+    "."
+  )
+
+  # 2) Contexto escrito por el usuario
+  contexto_usuario <- input$p2_llm_context
+  if (!nzchar(contexto_usuario)) {
+    contexto_usuario <- "El usuario no proporcionó contexto adicional."
+  }
+
+  # 3) Prompt para el LLM
+  prompt_llm <- paste0(
+    "Eres un auditor financiero que redacta conclusiones para papeles de trabajo.\n\n",
+    "Contexto general del encargo de auditoría:\n",
+    contexto_usuario, "\n\n",
+    "Resultados descriptivos de la variable analizada:\n",
+    resumen, "\n\n",
+    "Con base en esta información, redacta un párrafo claro y conciso (entre 8 y 12 líneas) ",
+    "que describa los principales hallazgos del análisis descriptivo, la concentración de montos, ",
+    "la presencia de valores extremos y cualquier aspecto relevante para la planificación de pruebas ",
+    "de auditoría. Escribe en español, en tono técnico pero entendible, evitando viñetas."
+  )
+
+  withProgress(message = "Generando informe con LLM...", value = 0, {
+    # ⚠️ Aquí protegemos la llamada al LLM
+    ans <- tryCatch(
+      {
+        ollama_generate(prompt_llm)
+      },
+      error = function(e) {
+        shiny::showNotification(
+          paste("Error al consultar el modelo LLM:", conditionMessage(e)),
+          type = "error",
+          duration = 10
+        )
+        return(NULL)
+      }
     )
 
-    # 2) Contexto escrito por el usuario
-    contexto_usuario <- input$p2_llm_context
-    if (!nzchar(contexto_usuario)) {
-      contexto_usuario <- "El usuario no proporcionó contexto adicional."
-    }
+    # Si falló, no seguimos y NO tumbamos la app
+    if (is.null(ans)) return(NULL)
 
-    # 3) Prompt para el LLM
-    prompt_llm <- paste0(
-      "Eres un auditor financiero que redacta conclusiones para papeles de trabajo.\n\n",
-      "Contexto general del encargo de auditoría:\n",
-      contexto_usuario, "\n\n",
-      "Resultados descriptivos de la variable analizada:\n",
-      resumen, "\n\n",
-      "Con base en esta información, redacta un párrafo claro y conciso (entre 8 y 12 líneas) ",
-      "que describa los principales hallazgos del análisis descriptivo, la concentración de montos, ",
-      "la presencia de valores extremos y cualquier aspecto relevante para la planificación de pruebas ",
-      "de auditoría. Escribe en español, en tono técnico pero entendible, evitando viñetas."
-    )
-
-    withProgress(message = "Generando informe con LLM...", value = 0, {
-      ans <- ollama_generate(prompt_llm)
-      p2_llm_text(ans)
-      output$p2_llm_preview <- renderText(ans)
-      shinyjs::show("p2_llm_docx")   # ahora sí mostramos el botón
-      incProgress(1)
-    })
+    # Si todo fue bien, actualizamos UI
+    p2_llm_text(ans)
+    output$p2_llm_preview <- renderText(ans)
+    shinyjs::show("p2_llm_docx")
+    incProgress(1)
   })
+})
 
   # ---- 1.7 Descarga del informe LLM en .docx ------------------------
   output$p2_llm_docx <- downloadHandler(
