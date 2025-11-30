@@ -230,6 +230,80 @@ En el muestreo por atributos, la App presenta los elementos seleccionados, el re
 
 # 5. Ejecución y Despliegue ⚙️
 
+Este proyecto puede ejecutarse tanto en un entorno local con R como mediante un contenedor Docker preparado para funcionar de forma inmediata. El objetivo es que cualquier auditor, analista o desarrollador pueda levantar la aplicación sin complicaciones técnicas.
+
+**5.1. Ejecución local**
+
+Para correr la aplicación directamente desde R o RStudio, solo se requiere abrir el proyecto, asegurarse de que las librerías necesarias estén instaladas y ejecutar el archivo principal de la App. La aplicación correrá en la dirección y puerto definidos (por defecto, localhost).
+
+El flujo general consiste en:
+
+•	Abrir el proyecto en RStudio.
+
+•	Confirmar que las librerías fueron instaladas mediante el script de dependencias.
+
+•	Ejecutar el archivo que inicia la App.
+
+•	Acceder a la interfaz desde el navegador.
+
+Esta modalidad es ideal para desarrollo, pruebas o ajustes rápidos.
+
+⸻
+
+**5.2. Uso de variables de entorno**
+
+La App utiliza variables de entorno que permiten ajustar fácilmente:
+
+•	El puerto donde correrá el servidor Shiny.
+
+•	El comportamiento del script de instalación de librerías (modo bootstrap vs. modo ejecución).
+
+•	La integración con modelos de lenguaje externos, como Ollama.
+
+Esto permite flexibilidad para adaptarse a distintos entornos, desde un equipo personal hasta un servidor institucional.
+
+⸻
+
+**5.3. Despliegue con Docker**
+
+La forma más estable y reproducible de ejecutar la aplicación es mediante Docker. La imagen incluye todas las dependencias instaladas, la App configurada y la integración con el modelo de lenguaje habilitada.
+
+Los pasos conceptuales son:
+
+•	Construir la imagen del proyecto.
+
+•	Crear el contenedor asignando un puerto de acceso para la interfaz.
+
+•	Iniciar el contenedor.
+
+•	Abrir la aplicación desde el navegador utilizando la dirección y puerto asignados.
+
+Una vez en ejecución, la App es completamente autónoma y no requiere reinstalar ningún paquete.
+
+⸻
+
+**5.4. Acceso desde el navegador**
+
+Independientemente del método utilizado (R o Docker), la aplicación se accede desde un navegador web.
+Normalmente se utiliza una dirección local del tipo:
+
+•	localhost seguido del número de puerto elegido.
+
+•	También es posible acceder desde otros dispositivos en la misma red local en caso de ser necesario.
+
+⸻
+
+**5.5. Consideraciones de despliegue y estabilidad**
+
+Para asegurar un funcionamiento óptimo:
+
+•	Se recomienda mantener la imagen Docker actualizada cuando se agreguen nuevas funcionalidades.
+	
+•	Al trabajar con modelos de lenguaje externos, verificar que el servicio esté disponible antes de solicitar un análisis.
+	
+•	Revisar ocasionalmente el consumo de memoria del contenedor si se utiliza con archivos grandes o se ejecutan muchos análisis consecutivos.
+
+Una vez instalado, el despliegue es muy estable: el contenedor se puede detener, reiniciar o mover sin perder la configuración, manteniendo un entorno reproducible y listo para producción.
 
 ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
 ![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white)
