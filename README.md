@@ -1,5 +1,15 @@
 # App Muestreo en Auditoria con LLM.
 
+Este proyecto implementa una aplicación Shiny para realizar muestreo por unidades monetarias (MUM), una técnica de muestreo utilizada en auditorías para evaluar la importancia relativa de las transacciones y balances.
+
+<table>
+  <tr>
+    <td><img src="/Recoursos/Shinylogo.png" alt="LogoShiny" style="width: 150px;"/></td>
+    <td><img src="/Recoursos/rshiny.png" alt="LogoShiny2" style="width: 150px;"/></td>
+  </tr>
+</table>
+
+
  ![class](/ima/ima1.png)
 
 
@@ -191,5 +201,12 @@ Se incluyen gráficos dinámicos, reactivos y paneles interactivos que facilitan
 ![class](/ima/ima7.png)
 
 # 5. Ejecución y Despliegue ⚙️
+
+
+![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
+![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
+![Apache](https://img.shields.io/badge/apache-%23D42029.svg?style=for-the-badge&logo=apache&logoColor=white)
 
 
