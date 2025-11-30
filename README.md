@@ -188,15 +188,43 @@ Se incluyen gráficos dinámicos, reactivos y paneles interactivos que facilitan
 
 # 4. Presentación visual de la App 🎨 (Screenshots)
 
+A continuación se muestran capturas reales de la aplicación Muestreo Auditoría, con el fin de ilustrar la navegación, las funciones principales y la experiencia de uso dentro de cada módulo.
+
+⸻
+
+**4.1. Pantalla principal — Presentación del sistema**
+
+La pantalla inicial introduce la aplicación en un entorno ordenado, con un panel lateral siempre visible para navegar entre los módulos. El banner ilustrado comunica de forma amigable el propósito general: análisis y muestreo aplicado a auditoría financiera.
+
 ![class](/ima/ima2.png)
+
+**4.2. Módulo Descriptivo — Estadísticas y análisis exploratorio**
+
+Este módulo permite cargar una base de datos, seleccionar una variable numérica y obtener automáticamente estadísticas descriptivas esenciales, percentiles, gráficos de distribución y análisis visuales que facilitan la comprensión del comportamiento de la población auditada.
+
+**4.3. Generación automática de informes con LLM**
+
+Junto con el análisis descriptivo, la App ofrece un generador de conclusiones basado en un modelo de lenguaje (LLM). El usuario ingresa un breve contexto y el sistema produce un borrador técnico, claro y apto para papeles de trabajo, con opción de descargar un documento en formato Word.
 
 ![class](/ima/ima3.png)
 
+**4.4. Módulo MUM — Guía interactiva y cálculo de muestra**
+
+La App incluye una guía incorporada que explica paso a paso la metodología MUM. Además, permite definir niveles de riesgo, materialidad, tolerancia y confianza, generando automáticamente la muestra monetaria óptima con una interfaz limpia y orientada al flujo del auditor.
+
 ![class](/ima/ima4.png)
+
+**4.5. Módulo MUM — Visualización de la muestra y comparaciones**
+
+Una vez generada, la muestra puede visualizarse y analizarse en detalle. Este módulo muestra las unidades seleccionadas, gráficos comparativos entre la población original y la muestra, densidades, distribuciones y exportación de la muestra en distintos formatos.
 
 ![class](/ima/ima5.png)
 
 ![class](/ima/ima6.png)
+
+**4.6. Módulo Atributos — Selección, resultados y comparaciones porcentuales**
+
+En el muestreo por atributos, la App presenta los elementos seleccionados, el resultado de la evaluación y la comparación porcentual entre la población y la muestra. La vista incluye gráficos claros para facilitar el análisis de desviaciones y la toma de decisiones.
 
 ![class](/ima/ima7.png)
 
