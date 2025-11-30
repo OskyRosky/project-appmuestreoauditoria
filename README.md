@@ -96,14 +96,100 @@ La idea es que este repositorio siga creciendo, integrando mejoras y aportes de 
 
 ---------------------------------------------
 
-# 1. 
+# 1. Overview del Proyecto 🧳
 
-# 2. 
+La App de Muestreo de Auditoría es una herramienta integral diseñada para apoyar a auditores, analistas financieros y equipos de fiscalización en la evaluación y validación de información numérica. Su objetivo es simplificar procesos complejos como el análisis descriptivo, la selección de muestras mediante metodologías reconocidas (MUM, LES y atributos) y la generación automatizada de conclusiones técnicas basadas en los datos cargados por el usuario.
 
-# 3. 
+La aplicación combina visualizaciones claras, análisis estadístico confiable y automatización inteligente para agilizar el trabajo de auditoría. Asimismo, incorpora un modelo de lenguaje (LLM) para redactar informes preliminares de forma precisa y contextualizada, lo que reduce tiempos y mejora la calidad del reporte final.
 
-# 4.
+Está pensada para profesionales que buscan eficiencia, trazabilidad y consistencia en sus procedimientos, sin necesidad de depender de herramientas externas o procesos manuales.
 
-# 5. Ejemplos de la App.
+# 2. Arquitectura y Tecnologías 🤖
+
+La aplicación está construida sobre una arquitectura modular que facilita el mantenimiento, la escalabilidad y la claridad del proyecto. Cada parte cumple una función específica dentro del flujo de análisis y permite que la aplicación funcione de forma ordenada y confiable. En el núcleo se encuentra R + Shiny, responsables de la interfaz, la experiencia del usuario y la comunicación entre los módulos. La estructura se organiza en componentes independientes: la UI (header, sider y body), la lógica de servidor, los scripts de procesamiento y los recursos estáticos. Esta separación garantiza que cada parte pueda evolucionar sin afectar el resto del sistema.
+
+Para la generación de documentos y la integración con modelos de lenguaje, la app incorpora rmarkdown, officer, flextable, y la comunicación directa con Ollama, que permite redactar informes automatizados con base en los datos y el contexto que se analiza.El despliegue está completamente containerizado mediante Docker, lo que asegura que la App funcione igual en cualquier entorno, sin depender de configuraciones externas. Dentro del contenedor se gestionan las dependencias, el entorno de ejecución y las librerías utilizadas, mientras que Ollama corre en el host y se comunica desde el contenedor a través del puente HTTP.
+
+El resultado es una solución robusta, portable y reproducible, diseñada para que cualquier auditor o analista pueda ejecutarla sin fricciones.
+
+# 3. Funcionalidades principales 📌
+
+La aplicación reúne un conjunto de herramientas diseñadas específicamente para el análisis financiero y la elaboración de papeles de trabajo en auditoría. Cada módulo cumple una función práctica, orientada a facilitar el flujo de revisión, documentación y generación de evidencia.
+
+Entre sus funcionalidades más importantes destacan:
+
+## Análisis descriptivo inmediato
+
+Permite cargar archivos, seleccionar variables y obtener estadísticas clave como mínimos, máximos, percentiles, promedios y medidas de dispersión. Incluye tablas y gráficos que ayudan a comprender la distribución y el comportamiento de los datos.
+
+## Muestreo financiero especializado
+
+La app integra diferentes enfoques utilizados en auditoría:
+
+•	MUM (Monetary Unit Sampling)
+
+•	LES (Line-Item Evaluation Sampling)
+
+•	Muestreo por atributos
+
+Cada módulo guía al usuario paso a paso para definir parámetros, generar muestras y visualizar la evidencia resultante.
+
+## Generación automática de informes DOCX
+
+En cada sección, el usuario puede generar un informe en formato Word.
+Los reportes incluyen:
+
+•	Los resultados del análisis realizado.
+
+•	Gráficos y tablas relevantes.
+
+•	Conclusiones redactadas en lenguaje técnico.
+
+Todo se genera con plantillas consistentes y listas para incorporarse en el expediente de auditoría.
+
+## Integración con Modelos de Lenguaje (LLM)
+
+La aplicación se conecta con Ollama para redactar conclusiones, resúmenes y observaciones de auditoría basados en:
+
+•	Los datos analizados.
+
+•	El contexto proporcionado por el usuario.
+
+•	Los resultados estadísticos de cada módulo.
+
+Esto agiliza la documentación para los papeles de trabajo y aumenta la calidad de las conclusiones.
+
+## Validación y limpieza automática
+
+Cuando se cargan los datos, la app realiza verificaciones básicas:
+
+•	Detección de tipos de variables.
+
+•	Presencia de NA o valores extremos.
+
+•	Compatibilidad de columnas según el módulo.
+
+Estas validaciones reducen errores y aseguran un flujo continuo.
+
+## Visualización clara y diseño moderno
+
+La organización modular del UI (encabezado, menú lateral y cuerpo principal) permite navegar fácilmente por cada sección.
+Se incluyen gráficos dinámicos, reactivos y paneles interactivos que facilitan el análisis visual.
+
+# 4. Presentación visual de la App 🎨 (Screenshots)
+
+![class](/ima/ima2.png)
+
+![class](/ima/ima3.png)
+
+![class](/ima/ima4.png)
+
+![class](/ima/ima5.png)
+
+![class](/ima/ima6.png)
+
+![class](/ima/ima7.png)
+
+# 5. Ejecución y Despliegue ⚙️
 
 
