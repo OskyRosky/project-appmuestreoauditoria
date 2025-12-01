@@ -4,8 +4,8 @@ Este proyecto implementa una aplicación Shiny para realizar muestreo por unidad
 
 <table>
   <tr>
-    <td><img src="/Recoursos/Shinylogo.png" alt="LogoShiny" style="width: 150px;"/></td>
-    <td><img src="/Recoursos/rshiny.png" alt="LogoShiny2" style="width: 150px;"/></td>
+    <td><img src="/ima/Shinylogo.png" alt="LogoShiny" style="width: 150px;"/></td>
+    <td><img src="/ima/rshiny.png" alt="LogoShiny2" style="width: 150px;"/></td>
   </tr>
 </table>
 
@@ -188,20 +188,122 @@ Se incluyen gráficos dinámicos, reactivos y paneles interactivos que facilitan
 
 # 4. Presentación visual de la App 🎨 (Screenshots)
 
+A continuación se muestran capturas reales de la aplicación Muestreo Auditoría, con el fin de ilustrar la navegación, las funciones principales y la experiencia de uso dentro de cada módulo.
+
+⸻
+
+**4.1. Pantalla principal — Presentación del sistema**
+
+La pantalla inicial introduce la aplicación en un entorno ordenado, con un panel lateral siempre visible para navegar entre los módulos. El banner ilustrado comunica de forma amigable el propósito general: análisis y muestreo aplicado a auditoría financiera.
+
 ![class](/ima/ima2.png)
+
+**4.2. Módulo Descriptivo — Estadísticas y análisis exploratorio**
+
+Este módulo permite cargar una base de datos, seleccionar una variable numérica y obtener automáticamente estadísticas descriptivas esenciales, percentiles, gráficos de distribución y análisis visuales que facilitan la comprensión del comportamiento de la población auditada.
+
+**4.3. Generación automática de informes con LLM**
+
+Junto con el análisis descriptivo, la App ofrece un generador de conclusiones basado en un modelo de lenguaje (LLM). El usuario ingresa un breve contexto y el sistema produce un borrador técnico, claro y apto para papeles de trabajo, con opción de descargar un documento en formato Word.
 
 ![class](/ima/ima3.png)
 
+**4.4. Módulo MUM — Guía interactiva y cálculo de muestra**
+
+La App incluye una guía incorporada que explica paso a paso la metodología MUM. Además, permite definir niveles de riesgo, materialidad, tolerancia y confianza, generando automáticamente la muestra monetaria óptima con una interfaz limpia y orientada al flujo del auditor.
+
 ![class](/ima/ima4.png)
+
+**4.5. Módulo MUM — Visualización de la muestra y comparaciones**
+
+Una vez generada, la muestra puede visualizarse y analizarse en detalle. Este módulo muestra las unidades seleccionadas, gráficos comparativos entre la población original y la muestra, densidades, distribuciones y exportación de la muestra en distintos formatos.
 
 ![class](/ima/ima5.png)
 
 ![class](/ima/ima6.png)
 
+**4.6. Módulo Atributos — Selección, resultados y comparaciones porcentuales**
+
+En el muestreo por atributos, la App presenta los elementos seleccionados, el resultado de la evaluación y la comparación porcentual entre la población y la muestra. La vista incluye gráficos claros para facilitar el análisis de desviaciones y la toma de decisiones.
+
 ![class](/ima/ima7.png)
 
 # 5. Ejecución y Despliegue ⚙️
 
+Este proyecto puede ejecutarse tanto en un entorno local con R como mediante un contenedor Docker preparado para funcionar de forma inmediata. El objetivo es que cualquier auditor, analista o desarrollador pueda levantar la aplicación sin complicaciones técnicas.
+
+**5.1. Ejecución local**
+
+Para correr la aplicación directamente desde R o RStudio, solo se requiere abrir el proyecto, asegurarse de que las librerías necesarias estén instaladas y ejecutar el archivo principal de la App. La aplicación correrá en la dirección y puerto definidos (por defecto, localhost).
+
+El flujo general consiste en:
+
+•	Abrir el proyecto en RStudio.
+
+•	Confirmar que las librerías fueron instaladas mediante el script de dependencias.
+
+•	Ejecutar el archivo que inicia la App.
+
+•	Acceder a la interfaz desde el navegador.
+
+Esta modalidad es ideal para desarrollo, pruebas o ajustes rápidos.
+
+⸻
+
+**5.2. Uso de variables de entorno**
+
+La App utiliza variables de entorno que permiten ajustar fácilmente:
+
+•	El puerto donde correrá el servidor Shiny.
+
+•	El comportamiento del script de instalación de librerías (modo bootstrap vs. modo ejecución).
+
+•	La integración con modelos de lenguaje externos, como Ollama.
+
+Esto permite flexibilidad para adaptarse a distintos entornos, desde un equipo personal hasta un servidor institucional.
+
+⸻
+
+**5.3. Despliegue con Docker**
+
+La forma más estable y reproducible de ejecutar la aplicación es mediante Docker. La imagen incluye todas las dependencias instaladas, la App configurada y la integración con el modelo de lenguaje habilitada.
+
+Los pasos conceptuales son:
+
+•	Construir la imagen del proyecto.
+
+•	Crear el contenedor asignando un puerto de acceso para la interfaz.
+
+•	Iniciar el contenedor.
+
+•	Abrir la aplicación desde el navegador utilizando la dirección y puerto asignados.
+
+Una vez en ejecución, la App es completamente autónoma y no requiere reinstalar ningún paquete.
+
+⸻
+
+**5.4. Acceso desde el navegador**
+
+Independientemente del método utilizado (R o Docker), la aplicación se accede desde un navegador web.
+Normalmente se utiliza una dirección local del tipo:
+
+•	localhost seguido del número de puerto elegido.
+
+•	También es posible acceder desde otros dispositivos en la misma red local en caso de ser necesario.
+
+⸻
+
+**5.5. Consideraciones de despliegue y estabilidad**
+
+Para asegurar un funcionamiento óptimo:
+
+•	Se recomienda mantener la imagen Docker actualizada cuando se agreguen nuevas funcionalidades.
+	
+•	Al trabajar con modelos de lenguaje externos, verificar que el servicio esté disponible antes de solicitar un análisis.
+	
+•	Revisar ocasionalmente el consumo de memoria del contenedor si se utiliza con archivos grandes o se ejecutan muchos análisis consecutivos.
+
+Una vez instalado, el despliegue es muy estable: el contenedor se puede detener, reiniciar o mover sin perder la configuración, manteniendo un entorno reproducible y listo para producción.
 
 ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
 ![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white)
