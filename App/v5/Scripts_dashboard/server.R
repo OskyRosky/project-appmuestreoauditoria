@@ -1776,16 +1776,46 @@ observeEvent(input$p4_llm_generate, {
 })
 
 # Descarga del informe LES generado por LLM en DOCX
+
 output$p4_llm_docx <- downloadHandler(
   filename = function() {
     paste0("Informe_LLM_Muestreo_LES_", Sys.Date(), ".docx")
   },
   content = function(file) {
     tryCatch({
-      req(p4_llm_text())
       if (!requireNamespace("officer", quietly = TRUE)) {
         stop("El paquete 'officer' es necesario para generar el DOCX.")
       }
+
+      if (is.null(p4_llm_text()) || !nzchar(p4_llm_text())) {
+        stop("No existe texto generado por el LLM para LES.")
+      }
+
+      if (is.null(data3())) {
+        stop("data3() es NULL.")
+      }
+
+      if (is.null(input$variable3) || !nzchar(input$variable3)) {
+        stop("input$variable3 es NULL o vacío.")
+      }
+
+      if (is.null(rv$sample_size_les)) {
+        stop("rv$sample_size_les es NULL.")
+      }
+
+      if (is.null(rv$seed_les)) {
+        stop("rv$seed_les es NULL.")
+      }
+
+      if (is.null(rv$muestra_les) || nrow(rv$muestra_les) == 0) {
+        stop("rv$muestra_les es NULL o está vacío.")
+      }
+
+      var_name <- input$variable3
+      les_value <- input$LES
+
+      conteo_mayores <- sum(rv$muestra_les[[var_name]] > les_value, na.rm = TRUE)
+      conteo_menores_iguales <- sum(rv$muestra_les[[var_name]] <= les_value, na.rm = TRUE)
 
       doc <- officer::read_docx() |>
         officer::body_add_par(
@@ -1801,23 +1831,66 @@ output$p4_llm_docx <- downloadHandler(
           style = "heading 2"
         ) |>
         officer::body_add_par(
+          "Parámetros principales del muestreo:",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
           paste("Valor LES aplicado:", input$LES),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Error tolerable:", input$freq1_LES),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Error esperado:", input$freq2_LES),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Nivel de confianza:", input$freq3_LES),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Distribución de planificación:", input$distri_2),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Tamaño de muestra LES:", rv$sample_size_les),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Semilla utilizada para selección:", rv$seed_les),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Partidas mayores que LES en la muestra:", conteo_mayores),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Partidas menores o iguales a LES en la muestra:", conteo_menores_iguales),
           style = "Normal"
         ) |>
         officer::body_add_par(
           "Conclusión generada con modelo de lenguaje (LLM):",
           style = "heading 3"
         ) |>
-        officer::body_add_par(p4_llm_text(), style = "Normal")
+        officer::body_add_par(
+          p4_llm_text(),
+          style = "Normal"
+        )
 
       print(doc, target = file)
+
     }, error = function(e) {
+      message("\n********** ERROR DOCX LLM LES **********")
+      message("Mensaje real del error:")
+      print(conditionMessage(e))
+      message("***************************************\n")
+
       showNotification(
         paste("No se pudo generar el DOCX (Informe LLM LES):", conditionMessage(e)),
-        type = "error", duration = 10
-      )
-      shiny::validate(
-        shiny::need(FALSE, "Fallo en la generación del informe LLM (LES).")
+        type = "error",
+        duration = 10
       )
     })
   },
@@ -2108,36 +2181,146 @@ output$download5.3 <- downloadHandler(
 
   # Descarga del informe LLM Atributos en DOCX
   output$p5_llm_docx <- downloadHandler(
-    filename = function() {
-      paste0("Informe_LLM_Muestreo_Atributos_", Sys.Date(), ".docx")
-    },
-    content = function(file) {
-      tryCatch({
-        req(p5_llm_text())
-        if (!requireNamespace("officer", quietly = TRUE)) {
-          stop("El paquete 'officer' es necesario para generar el DOCX.")
-        }
+  filename = function() {
+    paste0("Informe_LLM_Muestreo_Atributos_", Sys.Date(), ".docx")
+  },
+  content = function(file) {
+    tryCatch({
+      if (!requireNamespace("officer", quietly = TRUE)) {
+        stop("El paquete 'officer' es necesario para generar el DOCX.")
+      }
 
-        doc <- officer::read_docx() |>
-          officer::body_add_par("Informe automatizado - Muestreo Atributos", style = "heading 1") |>
-          officer::body_add_par(paste("Archivo de datos:", input$file4$name), style = "heading 2") |>
-          officer::body_add_par(paste("Variable de atributo utilizada:", input$variable4), style = "heading 2") |>
-          officer::body_add_par("Conclusión generada con modelo de lenguaje (LLM):", style = "heading 3") |>
-          officer::body_add_par(p5_llm_text(), style = "Normal")
+      if (is.null(p5_llm_text()) || !nzchar(p5_llm_text())) {
+        stop("No existe texto generado por el LLM para Atributos.")
+      }
 
-        print(doc, target = file)
-      }, error = function(e) {
-        showNotification(
-          paste("No se pudo generar el DOCX (Informe LLM Atributos):", conditionMessage(e)),
-          type = "error", duration = 10
+      if (is.null(data4())) {
+        stop("data4() es NULL.")
+      }
+
+      if (is.null(input$variable4) || !nzchar(input$variable4)) {
+        stop("input$variable4 es NULL o vacío.")
+      }
+
+      if (is.null(rv$sample_size_atri)) {
+        stop("rv$sample_size_atri es NULL.")
+      }
+
+      if (is.null(rv$seed_atri)) {
+        stop("rv$seed_atri es NULL.")
+      }
+
+      if (is.null(rv$muestra_atri) || nrow(rv$muestra_atri) == 0) {
+        stop("rv$muestra_atri es NULL o está vacío.")
+      }
+
+      var_name <- input$variable4
+
+      origen <- data4() |>
+        dplyr::group_by(Categoria = .data[[var_name]]) |>
+        dplyr::tally(name = "Total") |>
+        dplyr::mutate(Porcentaje = round((Total / sum(Total)) * 100, 1)) |>
+        dplyr::ungroup()
+
+      muestra <- rv$muestra_atri |>
+        dplyr::group_by(Categoria = .data[[var_name]]) |>
+        dplyr::tally(name = "Total") |>
+        dplyr::mutate(Porcentaje = round((Total / sum(Total)) * 100, 1)) |>
+        dplyr::ungroup()
+
+      resumen_poblacion <- paste0(
+        origen$Categoria, ": ", origen$Porcentaje, "%",
+        collapse = " | "
+      )
+
+      resumen_muestra <- paste0(
+        muestra$Categoria, ": ", muestra$Porcentaje, "%",
+        collapse = " | "
+      )
+
+      doc <- officer::read_docx() |>
+        officer::body_add_par(
+          "Informe automatizado - Muestreo Atributos",
+          style = "heading 1"
+        ) |>
+        officer::body_add_par(
+          paste("Archivo de datos:", input$file4$name),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          paste("Variable de atributo utilizada:", input$variable4),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          "Parámetros principales del muestreo:",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
+          paste("Tasa de desviación tolerable:", input$freq1_Atri),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Tasa de desviación esperada:", input$freq2_Atri),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Nivel de confianza:", input$freq3_Atri),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Distribución de planificación:", input$distri_3),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Tamaño de muestra Atributos:", rv$sample_size_atri),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Semilla utilizada para selección:", rv$seed_atri),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          "Distribución porcentual en la población:",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
+          resumen_poblacion,
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          "Distribución porcentual en la muestra:",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
+          resumen_muestra,
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          "Conclusión generada con modelo de lenguaje (LLM):",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
+          p5_llm_text(),
+          style = "Normal"
         )
-        shiny::validate(
-          shiny::need(FALSE, "Fallo en la generación del informe LLM (Atributos).")
-        )
-      })
-    },
-    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ) 
+
+      print(doc, target = file)
+
+    }, error = function(e) {
+      message("\n********** ERROR DOCX LLM ATRIBUTOS **********")
+      message("Mensaje real del error:")
+      print(conditionMessage(e))
+      message("*********************************************\n")
+
+      showNotification(
+        paste("No se pudo generar el DOCX (Informe LLM Atributos):", conditionMessage(e)),
+        type = "error",
+        duration = 10
+      )
+    })
+  },
+  contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
 
   # =====================================================================
   # 5) EVALUACIÓN (p6)  - fileInput: file5
