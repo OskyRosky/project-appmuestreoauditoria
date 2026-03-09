@@ -12,7 +12,7 @@
 #     * corre la app R/Shiny dentro del mismo contenedor
 
 # 1. Imagen base con R, forzada a linux/amd64
-FROM --platform=linux/amd64 rocker/r-ver:4.4.2
+FROM rocker/r-ver:4.4.2
 
 # 2. Variables globales del contenedor
 ENV DEBIAN_FRONTEND=noninteractive
@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     software-properties-common \
+    zstd \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
