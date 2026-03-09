@@ -942,27 +942,149 @@ observeEvent(input$p2_llm_generate, {
 })
 
   # ---- 1.7 Descarga del informe LLM en .docx ------------------------
-  output$p2_llm_docx <- downloadHandler(
-    filename = function() {
-      paste0("Informe_LLM_Descriptivo_", Sys.Date(), ".docx")
-    },
-    content = function(file) {
-      req(p2_llm_text())
-      if (!requireNamespace("officer", quietly = TRUE)) {
-        stop("El paquete 'officer' es necesario para generar el DOCX.")
-      }
 
-      doc <- officer::read_docx() |>
-        officer::body_add_par("Informe automatizado - Análisis Descriptivo", style = "heading 1") |>
-        officer::body_add_par(paste("Archivo de datos:", input$file1$name), style = "heading 2") |>
-        officer::body_add_par(paste("Variable analizada:", input$variable1), style = "heading 2") |>
-        officer::body_add_par("Conclusión generada con modelo de lenguaje (LLM):", style = "heading 3") |>
-        officer::body_add_par(p2_llm_text(), style = "Normal")
+output$p2_llm_docx <- downloadHandler(
+  filename = function() {
+    paste0("Informe_LLM_Descriptivo_", Sys.Date(), ".docx")
+  },
+  content = function(file) {
+    req(data1(), input$variable1, p2_llm_text())
+    .need_numeric(data1(), input$variable1)
 
-      print(doc, target = file)
-    },
-    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  )
+    if (!requireNamespace("officer", quietly = TRUE)) {
+      stop("El paquete 'officer' es necesario para generar el DOCX.")
+    }
+    if (!requireNamespace("flextable", quietly = TRUE)) {
+      stop("El paquete 'flextable' es necesario para generar el DOCX.")
+    }
+
+    var_name  <- input$variable1
+    file_name <- input$file1$name
+    var_data  <- data1()[[var_name]]
+
+    contexto_usuario <- input$p2_llm_context
+    if (is.null(contexto_usuario) || !nzchar(trimws(contexto_usuario))) {
+      contexto_usuario <- "El usuario no proporcionó contexto adicional."
+    }
+
+    Stats <- tibble::tibble(
+      Medida = c(
+        "Conteo de Casos",
+        "Valores Negativos",
+        "Valores Faltantes",
+        "Mínimo",
+        "Máximo",
+        "Promedio",
+        "Mediana",
+        "Moda",
+        "Desviación Estándar",
+        "Percentil 10",
+        "Percentil 25",
+        "Percentil 50",
+        "Percentil 75",
+        "Percentil 90"
+      ),
+      Valor = c(
+        sum(!is.na(var_data)),
+        sum(var_data < 0, na.rm = TRUE),
+        sum(is.na(var_data)),
+        min(var_data, na.rm = TRUE),
+        max(var_data, na.rm = TRUE),
+        mean(var_data, na.rm = TRUE),
+        median(var_data, na.rm = TRUE),
+        as.numeric(names(sort(table(var_data), decreasing = TRUE)[1])),
+        stats::sd(var_data, na.rm = TRUE),
+        stats::quantile(var_data, 0.10, na.rm = TRUE),
+        stats::quantile(var_data, 0.25, na.rm = TRUE),
+        stats::quantile(var_data, 0.50, na.rm = TRUE),
+        stats::quantile(var_data, 0.75, na.rm = TRUE),
+        stats::quantile(var_data, 0.90, na.rm = TRUE)
+      )
+    ) |>
+      dplyr::mutate(Valor = round(Valor, 2))
+
+    ft <- flextable::flextable(Stats)
+
+    doc <- officer::read_docx() |>
+      officer::body_add_par(
+        "Informe automatizado - Análisis Descriptivo",
+        style = "heading 1"
+      ) |>
+      officer::body_add_par(
+        paste("Archivo de datos:", file_name),
+        style = "heading 2"
+      ) |>
+      officer::body_add_par(
+        paste("Variable analizada:", var_name),
+        style = "heading 2"
+      ) |>
+      officer::body_add_par(
+        "Contexto del análisis:",
+        style = "heading 3"
+      ) |>
+      officer::body_add_par(
+        contexto_usuario,
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        "Parámetros principales del análisis descriptivo:",
+        style = "heading 3"
+      ) |>
+      officer::body_add_par(
+        paste("Conteo de casos no faltantes:", sum(!is.na(var_data))),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Valores negativos:", sum(var_data < 0, na.rm = TRUE)),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Valores faltantes:", sum(is.na(var_data))),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Mínimo:", round(min(var_data, na.rm = TRUE), 2)),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Máximo:", round(max(var_data, na.rm = TRUE), 2)),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Promedio:", round(mean(var_data, na.rm = TRUE), 2)),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Mediana:", round(median(var_data, na.rm = TRUE), 2)),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        paste("Desviación estándar:", round(stats::sd(var_data, na.rm = TRUE), 2)),
+        style = "Normal"
+      ) |>
+      officer::body_add_par(
+        "Tabla de estadísticas descriptivas:",
+        style = "heading 3"
+      )
+
+    doc <- flextable::body_add_flextable(doc, value = ft)
+
+    doc <- doc |>
+      officer::body_add_par(
+        "Conclusión generada con modelo de lenguaje (LLM):",
+        style = "heading 3"
+      ) |>
+      officer::body_add_par(
+        p2_llm_text(),
+        style = "Normal"
+      )
+
+    print(doc, target = file)
+  },
+  contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
+
+
   # =====================================================================
   # 2) MUESTREO MUM (p3)  - fileInput: file2
   # =====================================================================
