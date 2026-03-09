@@ -1,0 +1,7 @@
+
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rds
+*.RData
