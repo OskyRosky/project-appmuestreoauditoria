@@ -218,7 +218,7 @@ output$header_help_button <- renderUI({
 # =========================================================
 
 ollama_generate <- function(prompt,
-                            model = Sys.getenv("OLLAMA_MODEL", "llama3.3:latest"),
+                            model = Sys.getenv("OLLAMA_MODEL", "llama3:latest"),
                             host  = Sys.getenv("OLLAMA_HOST",  "http://localhost:11434")) {
 
   stopifnot(is.character(prompt), length(prompt) == 1)
