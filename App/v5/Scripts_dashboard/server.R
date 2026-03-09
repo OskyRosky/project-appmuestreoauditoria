@@ -2717,43 +2717,165 @@ output$download3.3 <- downloadHandler(
   })
 
   # Descarga DOCX del informe LLM de Evaluación
+
   output$p6_llm_docx <- downloadHandler(
-    filename = function() {
-      paste0("Informe_LLM_Evaluacion_", Sys.Date(), ".docx")
-    },
-    content = function(file) {
-      tryCatch({
-        req(p6_llm_text())
-        if (!requireNamespace("officer", quietly = TRUE)) {
-          stop("El paquete 'officer' es necesario para generar el DOCX.")
-        }
+  filename = function() {
+    paste0("Informe_LLM_Evaluacion_", Sys.Date(), ".docx")
+  },
+  content = function(file) {
+    tryCatch({
+      if (!requireNamespace("officer", quietly = TRUE)) {
+        stop("El paquete 'officer' es necesario para generar el DOCX.")
+      }
 
-        doc <- officer::read_docx() |>
-          officer::body_add_par("Informe automatizado - Evaluación de muestreo", style = "heading 1") |>
-          officer::body_add_par(paste("Archivo de datos:", input$file5$name), style = "heading 2") |>
+      if (is.null(p6_llm_text()) || !nzchar(p6_llm_text())) {
+        stop("No existe texto generado por el LLM para Evaluación.")
+      }
+
+      req(DatosEval(), Diferencias(), input$file5, input$select_var1, input$select_var2)
+
+      dd <- DatosEval()
+
+      suma_obs   <- round(sum(dd$Observado, na.rm = TRUE), 1)
+      suma_aud   <- round(sum(dd$Auditado,  na.rm = TRUE), 1)
+      n_casos    <- nrow(dd)
+      dif_total  <- round(sum(abs(dd$Observado - dd$Auditado), na.rm = TRUE), 1)
+      porc_dif   <- round((dif_total / max(suma_aud, 1e-9)) * 100, 1)
+      conteo_dif <- sum(dd$Observado != dd$Auditado, na.rm = TRUE)
+
+      sobrev <- sum(dd$Observado > dd$Auditado, na.rm = TRUE)
+      infrav <- sum(dd$Observado < dd$Auditado, na.rm = TRUE)
+
+      suma_sobrev <- round(
+        sum(
+          dd$Observado[dd$Observado > dd$Auditado] -
+            dd$Auditado[dd$Observado > dd$Auditado],
+          na.rm = TRUE
+        ),
+        1
+      )
+
+      suma_infrav <- round(
+        sum(
+          dd$Auditado[dd$Observado < dd$Auditado] -
+            dd$Observado[dd$Observado < dd$Auditado],
+          na.rm = TRUE
+        ),
+        1
+      )
+
+      doc <- officer::read_docx() |>
+        officer::body_add_par(
+          "Informe automatizado - Evaluación de muestreo",
+          style = "heading 1"
+        ) |>
+        officer::body_add_par(
+          paste("Archivo de datos:", input$file5$name),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          paste("Variable observada:", input$select_var1),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          paste("Variable auditada:", input$select_var2),
+          style = "heading 2"
+        ) |>
+        officer::body_add_par(
+          "Parámetros principales de la evaluación:",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
+          paste("Número de partidas evaluadas:", n_casos),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Suma total observada:", suma_obs),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Suma total auditada:", suma_aud),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Diferencia monetaria total:", dif_total),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Porcentaje de diferencia:", porc_dif, "%"),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Conteo de partidas con diferencia:", conteo_dif),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Cantidad de sobrevaloraciones:", sobrev),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Monto total de sobrevaloraciones:", suma_sobrev),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Cantidad de infravaloraciones:", infrav),
+          style = "Normal"
+        ) |>
+        officer::body_add_par(
+          paste("Monto total de infravaloraciones:", suma_infrav),
+          style = "Normal"
+        )
+
+      if (!is.null(rv$eval_decision)) {
+        doc <- doc |>
           officer::body_add_par(
-            paste("Variables evaluadas: Observado =", input$select_var1,
-                  ", Auditado =", input$select_var2),
+            "Criterios empíricos aplicados:",
             style = "heading 3"
           ) |>
           officer::body_add_par(
-            "Conclusión generada con modelo de lenguaje (LLM):",
-            style = "heading 3"
+            paste("Monto máximo tolerable:", input$monto_maximo),
+            style = "Normal"
           ) |>
-          officer::body_add_par(p6_llm_text(), style = "Normal")
+          officer::body_add_par(
+            paste("Porcentaje máximo tolerado:", input$porcentaje_umbral),
+            style = "Normal"
+          ) |>
+          officer::body_add_par(
+            paste("Conteo máximo de diferencias:", input$conteo_umbral),
+            style = "Normal"
+          ) |>
+          officer::body_add_par(
+            paste("Conteo máximo fuera de límites:", input$casos_umbral),
+            style = "Normal"
+          )
+      }
 
-        print(doc, target = file)
-      }, error = function(e) {
-        showNotification(
-          paste("No se pudo generar el DOCX (Informe LLM Evaluación):", conditionMessage(e)),
-          type = "error", duration = 10
+      doc <- doc |>
+        officer::body_add_par(
+          "Conclusión generada con modelo de lenguaje (LLM):",
+          style = "heading 3"
+        ) |>
+        officer::body_add_par(
+          p6_llm_text(),
+          style = "Normal"
         )
-        shiny::validate(
-          shiny::need(FALSE, "Fallo en la generación del informe LLM (Evaluación).")
-        )
-      })
-    },
-    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  )
+
+      print(doc, target = file)
+
+    }, error = function(e) {
+      message("\n********** ERROR DOCX LLM EVALUACION **********")
+      message("Mensaje real del error:")
+      print(conditionMessage(e))
+      message("***********************************************\n")
+
+      showNotification(
+        paste("No se pudo generar el DOCX (Informe LLM Evaluación):", conditionMessage(e)),
+        type = "error",
+        duration = 10
+      )
+    })
+  },
+  contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
 
 }
