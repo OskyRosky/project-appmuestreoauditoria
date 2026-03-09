@@ -5,3 +5,10 @@
 *.zip
 *.rds
 *.RData
+
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rds
+*.RData
