@@ -6,3 +6,11 @@
 *.rds
 *.RData
 .DS_Store
+
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rds
+*.RData
+.DS_Store
