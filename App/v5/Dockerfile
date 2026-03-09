@@ -1,50 +1,140 @@
-# Dockerfile para AppAuditSampleLLM (v5)
+# Dockerfile para AppMuestreoAuditoria v5
+#
+# Objetivo:
+# - Empaquetar la app Shiny + Ollama + modelo llama3:latest
+# - Preparado para pruebas locales
+# - Compatible con linux/amd64 (x86_64), pensando en ECS + Fargate
+# - Puerto de la app: 8005
+#
+# Nota:
+# - Este contenedor es monolítico:
+#     * corre Ollama dentro del mismo contenedor
+#     * corre la app R/Shiny dentro del mismo contenedor
 
-# 1. Imagen base con R (nosotros lanzamos la app, sin shiny-server)
-FROM rocker/r-ver:4.4.2
+# 1. Imagen base con R, forzada a linux/amd64
+FROM --platform=linux/amd64 rocker/r-ver:4.4.2
 
-# 2. Evitar prompts interactivos en las instalaciones
+# 2. Variables globales del contenedor
 ENV DEBIAN_FRONTEND=noninteractive
+ENV APP_DIR=/app
+ENV APP_HOST=0.0.0.0
+ENV APP_PORT=8005
+ENV OLLAMA_HOST=http://127.0.0.1:11434
+ENV OLLAMA_MODEL=llama3:latest
+ENV PATH=/usr/local/bin:$PATH
 
-# 3. Paquetes de sistema necesarios para R y librerías "pesadas"
+# 3. Directorio principal de trabajo
+WORKDIR /app
+
+# 4. Instalar dependencias del sistema
+#
+# Incluye:
+# - utilitarios base
+# - librerías de compilación para paquetes R
+# - pandoc para reportes/docx/rmarkdown
+# - procps para inspección de procesos
 RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    ca-certificates \
+    gnupg \
+    software-properties-common \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
     libfontconfig1-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
     libfreetype6-dev \
     libpng-dev \
     libtiff5-dev \
     libjpeg-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    libmagick++-dev \
-    libpoppler-cpp-dev \
-    ghostscript \
-    curl \
+    libgit2-dev \
+    libicu-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    liblzma-dev \
+    libglpk40 \
+    libglpk-dev \
+    libxt6 \
+    libx11-6 \
+    libxt-dev \
+    pandoc \
+    pandoc-data \
+    git \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
-# 4. Copiar TODO el proyecto (AppAuditSample.R, www, data, Scripts_dashboard, LLM-R, etc.)
-WORKDIR /srv/AppAuditSampleLLM
-COPY . /srv/AppAuditSampleLLM
+# 5. Instalar Ollama dentro del contenedor
+RUN curl -fsSL https://ollama.com/install.sh | sh
 
-# 5. Fase de BOOTSTRAP (solo en build):
-#    APP_BOOTSTRAP=TRUE → instala paquetes en Librerias.R
-ENV APP_BOOTSTRAP=TRUE \
-    APP_HEAVY=TRUE
+# 6. Copiar todo el proyecto al contenedor
+COPY . ${APP_DIR}
 
-# 6. Pre-instalar todas las librerías R usando tu script de bootstrap
-RUN R -q -e "source('Scripts_dashboard/Librerias.R')"
+# 7. Instalar gestor de paquetes R moderno
+RUN R -e "install.packages('pak', repos='https://cloud.r-project.org')"
 
-# 7. Variables de entorno para el RUNTIME:
-#    APP_BOOTSTRAP=FALSE → YA NO instala, solo carga librerías
-ENV APP_BOOTSTRAP=FALSE \
-    APP_HEAVY=TRUE \
-    APP_HOST=0.0.0.0 \
-    APP_PORT=8001
+# 8. Instalar paquetes R necesarios para la app
+#
+# Aquí dejamos explícitos los principales paquetes usados por:
+# - Shiny
+# - tablas
+# - gráficos
+# - lectura/escritura de archivos
+# - reportes DOCX
+# - consumo de Ollama vía HTTP
+RUN R -e "pak::pkg_install(c( \
+  'shiny','shinydashboard','shinyWidgets','shinyjs','reactable','DT', \
+  'dplyr','tidyr','tibble','purrr','stringr','readr','readxl','writexl','openxlsx', \
+  'ggplot2','plotly','highcharter','htmlwidgets','scales', \
+  'officer','flextable','rmarkdown','knitr', \
+  'httr2','jsonlite','xml2','lubridate' \
+))"
 
-# 8. Exponer el puerto interno donde correrá Shiny
-EXPOSE 8001
+# 9. Crear carpeta donde Ollama guarda modelos
+RUN mkdir -p /root/.ollama
 
-# 9. Comando por defecto: lanzar tu app de muestreo con LLM
-CMD ["R","-q","-f","AppAuditSample.R"]
+# 10. Crear script de arranque del contenedor
+#
+# Flujo:
+# - inicia ollama serve
+# - espera a que Ollama responda
+# - verifica si llama3:latest existe
+# - si no existe, lo descarga
+# - luego arranca la app Shiny
+RUN printf '%s\n' \
+'#!/usr/bin/env bash' \
+'set -e' \
+'' \
+'echo "Iniciando Ollama..."' \
+'ollama serve > /tmp/ollama.log 2>&1 &' \
+'' \
+'for i in $(seq 1 60); do' \
+'  if curl -fsS http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then' \
+'    echo "Ollama listo."' \
+'    break' \
+'  fi' \
+'  sleep 1' \
+'done' \
+'' \
+'echo "Verificando modelo ${OLLAMA_MODEL}..."' \
+'if ! ollama list | grep -q "${OLLAMA_MODEL%%:*}"; then' \
+'  echo "Descargando modelo ${OLLAMA_MODEL}..."' \
+'  ollama pull "${OLLAMA_MODEL}"' \
+'else' \
+'  echo "Modelo ya presente."' \
+'fi' \
+'' \
+'echo "Iniciando app Shiny en ${APP_HOST}:${APP_PORT}..."' \
+'exec Rscript AppAuditSample.R' \
+> /usr/local/bin/start-app.sh \
+&& chmod +x /usr/local/bin/start-app.sh
+
+# 11. Exponer puertos
+#
+# 8005  -> app Shiny
+# 11434 -> Ollama interno
+EXPOSE 8005 11434
+
+# 12. Comando por defecto del contenedor
+CMD ["/usr/local/bin/start-app.sh"]
