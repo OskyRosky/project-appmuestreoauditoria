@@ -1237,55 +1237,93 @@ output$downloadReport2 <- downloadHandler(
   contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   content = function(file) {
     tryCatch({
-      # Requisitos mínimos para generar
-      req(data2(), input$variable2, rv$sample_size_mum, rv$seed_mum, rv$muestra_mum)
-      validate(need(nrow(rv$muestra_mum) > 0, "La muestra MUM está vacía."))
+      cat("\n========== DEBUG DOCX MUM ==========\n")
+      cat("Paso 1: validaciones explícitas\n")
 
-      # Paquetes de reporte (opcionalmente presentes)
-      have_officer   <- requireNamespace("officer",   quietly = TRUE)
-      have_flextable <- requireNamespace("flextable", quietly = TRUE)
-      if (!have_officer) stop("Falta paquete 'officer'.")
+      if (is.null(data2())) stop("data2() es NULL.")
+      if (is.null(input$variable2) || !nzchar(input$variable2)) stop("input$variable2 está vacío.")
+      if (is.null(rv$sample_size_mum)) stop("rv$sample_size_mum es NULL.")
+      if (is.null(rv$seed_mum)) stop("rv$seed_mum es NULL.")
+      if (is.null(rv$muestra_mum)) stop("rv$muestra_mum es NULL.")
+      if (!is.data.frame(rv$muestra_mum)) stop("rv$muestra_mum no es data.frame.")
+      if (nrow(rv$muestra_mum) == 0) stop("La muestra MUM está vacía.")
 
-      doc <- officer::read_docx() |>
-        officer::body_add_par("Muestreo por Unidades Monetarias", style = "heading 1") |>
-        officer::body_add_par("Parámetros", style = "heading 2") |>
-        officer::body_add_par(paste("Nombre del archivo de datos:", input$file2$name), style = "Normal") |>
-        officer::body_add_par(paste("Variable seleccionada:", input$variable2), style = "Normal") |>
-        officer::body_add_par(paste("Error Tolerable:", input$freq1_MUM), style = "Normal") |>
-        officer::body_add_par(paste("Error Esperado:", input$freq2_MUM), style = "Normal") |>
-        officer::body_add_par(paste("Nivel de confianza:", input$freq3_MUM), style = "Normal") |>
-        officer::body_add_par(paste("Selección de la distribución:", input$distri_1), style = "Normal") |>
-        officer::body_add_par("Información de Muestreo", style = "heading 2") |>
-        officer::body_add_par(paste("Tamaño de Muestra:", rv$sample_size_mum), style = "Normal") |>
-        officer::body_add_par(paste("Semilla para selección por PPT:", rv$seed_mum), style = "Normal")
-
-      # Gráfico comparativo
-      g   <- generarGraficoDensidadMUM(data2(), rv$muestra_mum, input$variable2)
-      img <- .ggsave_tmp(g, 7, 5, 300); on.exit(unlink(img), add = TRUE)
-
-      doc <- doc |>
-        officer::body_add_par("Gráfico comparativo entre valores originales y obtenidos por la muestra.", style = "heading 2") |>
-        officer::body_add_img(src = img, width = 7, height = 5) |>
-        officer::body_add_par("Muestra Seleccionada", style = "heading 2")
-
-      # Tabla: preferir flextable si está disponible; si no, usar body_add_table sin estilo
-      if (have_flextable && "body_add_flextable" %in% getNamespaceExports("flextable")) {
-        ft <- flextable::flextable(rv$muestra_mum)
-        doc <- flextable::body_add_flextable(doc, ft)
-      } else {
-        # Evita depender de un estilo que podría no existir en el template
-        doc <- officer::body_add_table(doc, value = rv$muestra_mum)
+      if (!requireNamespace("officer", quietly = TRUE)) {
+        stop("Falta paquete 'officer'.")
+      }
+      if (!requireNamespace("flextable", quietly = TRUE)) {
+        stop("Falta paquete 'flextable'.")
       }
 
+      cat("Paso 2: preparando tabla muestra\n")
+
+      muestra_tbl <- as.data.frame(rv$muestra_mum, stringsAsFactors = FALSE)
+      names(muestra_tbl) <- as.character(names(muestra_tbl))
+
+      muestra_tbl[] <- lapply(muestra_tbl, function(x) {
+        if (inherits(x, c("POSIXct", "POSIXt", "Date"))) {
+          as.character(x)
+        } else if (is.factor(x)) {
+          as.character(x)
+        } else if (is.list(x)) {
+          vapply(x, function(z) paste0(z, collapse = ", "), character(1))
+        } else {
+          x
+        }
+      })
+
+      cat("Paso 3: creando documento base\n")
+
+      doc <- officer::read_docx()
+      doc <- officer::body_add_par(doc, "Muestreo por Unidades Monetarias", style = "heading 1")
+      doc <- officer::body_add_par(doc, "Parámetros", style = "heading 2")
+      doc <- officer::body_add_par(doc, paste("Nombre del archivo de datos:", input$file2$name), style = "Normal")
+      doc <- officer::body_add_par(doc, paste("Variable seleccionada:", input$variable2), style = "Normal")
+      doc <- officer::body_add_par(doc, paste("Error Tolerable:", input$freq1_MUM), style = "Normal")
+      doc <- officer::body_add_par(doc, paste("Error Esperado:", input$freq2_MUM), style = "Normal")
+      doc <- officer::body_add_par(doc, paste("Nivel de confianza:", input$freq3_MUM), style = "Normal")
+      doc <- officer::body_add_par(doc, paste("Selección de la distribución:", input$distri_1), style = "Normal")
+      doc <- officer::body_add_par(doc, "Información de Muestreo", style = "heading 2")
+      doc <- officer::body_add_par(doc, paste("Tamaño de Muestra:", rv$sample_size_mum), style = "Normal")
+      doc <- officer::body_add_par(doc, paste("Semilla para selección por PPT:", rv$seed_mum), style = "Normal")
+
+      cat("Paso 4: creando gráfico\n")
+
+      g <- generarGraficoDensidadMUM(data2(), rv$muestra_mum, input$variable2)
+      img <- .ggsave_tmp(g, 7, 5, 300)
+      on.exit(unlink(img), add = TRUE)
+
+      doc <- officer::body_add_par(
+        doc,
+        "Gráfico comparativo entre valores originales y obtenidos por la muestra.",
+        style = "heading 2"
+      )
+      doc <- officer::body_add_img(doc, src = img, width = 7, height = 5)
+      doc <- officer::body_add_par(doc, "Muestra Seleccionada", style = "heading 2")
+
+      cat("Paso 5: agregando flextable\n")
+
+      ft <- flextable::flextable(muestra_tbl)
+      doc <- flextable::body_add_flextable(doc, value = ft)
+
+      cat("Paso 6: guardando archivo\n")
       print(doc, target = file)
 
-}, error = function(e) {
-  showNotification(paste("No se pudo generar el DOCX (MUM):", conditionMessage(e)),
-                   type = "error", duration = 10)
-  shiny::validate(
-    shiny::need(FALSE, "Fallo en la generación del reporte DOCX (MUM).")
-  )
-})
+      cat("Paso 7: DOCX generado OK\n")
+      cat("====================================\n\n")
+
+    }, error = function(e) {
+      cat("\n********** ERROR DOCX MUM **********\n")
+      cat("Mensaje real del error:\n")
+      print(conditionMessage(e))
+      cat("************************************\n\n")
+
+      showNotification(
+        paste("No se pudo generar el DOCX (MUM):", conditionMessage(e)),
+        type = "error",
+        duration = 10
+      )
+    })
   }
 )
 
