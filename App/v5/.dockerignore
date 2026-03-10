@@ -1,12 +1,39 @@
-.Rhistory
-.Rproj.user
-.RData
-.Ruserdata
-.git
-.gitignore
-*.Rproj
-data/raw/*
-Respaldo/
+# =============================================================
+# .dockerignore — AppMuestreoAuditoria v5
+# Excluye archivos que NO deben entrar en la imagen Docker
+# =============================================================
+
+# --- Datos de prueba (no van en producción) ---
+data/
+
+# --- Scripts de experimentos LLM ---
+LLM-R/
+
+# --- Carpetas de pruebas y respaldo ---
 Pruebas/
-Read me.pdf
-Read me.docx
+Respaldo/
+
+# --- Base de datos local Chroma ---
+chroma_db/
+
+# --- Archivos de sistema macOS ---
+.DS_Store
+**/.DS_Store
+
+# --- Git ---
+.git/
+.gitignore
+
+# --- Documentación ---
+Read\ me.docx
+Read\ me.pdf
+
+# --- El propio Dockerfile y dockerignore (no necesarios dentro) ---
+Dockerfile
+.dockerignore
+
+# --- Logs y temporales ---
+*.log
+*.tmp
+*.Rhistory
+.Rdata
