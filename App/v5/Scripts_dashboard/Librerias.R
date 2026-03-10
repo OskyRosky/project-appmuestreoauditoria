@@ -4,6 +4,12 @@
 # Modos:
 #   APP_BOOTSTRAP=TRUE  → instala + carga paquetes
 #   APP_BOOTSTRAP=FALSE → solo verifica y carga (runtime)
+#
+# NOTA sobre dependencies = NA:
+#   Solo instala Depends + Imports + LinkingTo.
+#   Excluye "Suggests" que son paquetes opcionales
+#   y que arrastran compilaciones pesadas innecesarias
+#   (ej: jfa sugiere rstan, Stan, BenfordTests, etc.)
 ###############################################
 
 # =========================================================
@@ -12,9 +18,9 @@
 os_name <- Sys.info()[["sysname"]]
 
 if (os_name == "Linux") {
-  # Linux / Docker → Posit Package Manager (PPM)
-  # pkgType NO se fuerza a "binary" porque Linux no lo soporta.
-  # PPM igual entrega paquetes precompilados vía "source".
+  # Linux / Docker → Posit Package Manager
+  # No se fuerza pkgType="binary" porque Linux no lo soporta.
+  # PPM igualmente entrega paquetes precompilados.
   options(
     repos = c(PPM = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
   )
@@ -59,7 +65,7 @@ if (os_name == "Linux") {
 )
 
 # =========================================================
-# (2) Variables de control
+# (2) Variables de control (desde entorno)
 # =========================================================
 bootstrap_flag <- Sys.getenv("APP_BOOTSTRAP", "FALSE")
 heavy_flag     <- Sys.getenv("APP_HEAVY",     "FALSE")
@@ -81,7 +87,10 @@ use_heavy    <- identical(toupper(heavy_flag),     "TRUE")
     return(invisible(TRUE))
   }
   message("📦 Instalando (", length(faltan), "): ", paste(faltan, collapse = ", "))
-  install.packages(faltan, dependencies = TRUE, quiet = TRUE)
+
+  # dependencies = NA → instala solo Depends + Imports + LinkingTo
+  # Excluye Suggests (opcionales) que generan compilaciones innecesarias
+  install.packages(faltan, dependencies = NA, quiet = TRUE)
   invisible(TRUE)
 }
 
