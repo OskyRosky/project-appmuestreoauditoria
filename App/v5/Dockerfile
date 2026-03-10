@@ -76,15 +76,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # -------------------------------------------------------------
-# (3) Instalar paquetes R (ANTES de copiar la app)
-#     → Esta capa queda cacheada aunque cambies el código R
-#     → PPM entrega binarios: sin compilación C++, ~5 min total
+# (3) Instalar paquetes R
 # -------------------------------------------------------------
 COPY Scripts_dashboard/Librerias.R /tmp/Librerias.R
 
 RUN R -q -e "\
   options(repos = c(PPM = 'https://packagemanager.posit.co/cran/__linux__/noble/latest')); \
-  options(pkgType = 'binary'); \
   source('/tmp/Librerias.R') \
 "
 
