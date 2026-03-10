@@ -1,110 +1,129 @@
 ###############################################
 # 🔧 Bootstrap de dependencias de la aplicación
 # ---------------------------------------------
-# Este script asegura que todas las librerías
-# necesarias estén instaladas y cargadas antes
-# de ejecutar la App de Muestreo de Auditoría.
+# Este script controla dos modos:
+#
+# 1) BOOTSTRAP  -> instala + carga paquetes
+#    APP_BOOTSTRAP=TRUE
+#
+# 2) RUNTIME    -> NO instala nada
+#    APP_BOOTSTRAP=FALSE
+#    Solo verifica que todo exista y luego carga.
+#
+# Esto evita que el contenedor Docker se quede
+# instalando paquetes cada vez que arranca.
 ###############################################
 
 # =========================================================
-# (0) Configuración del mirror CRAN
+# (0) Configuración general
 # =========================================================
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
 os_name <- Sys.info()[["sysname"]]
-
 if (os_name %in% c("Darwin", "Windows")) {
-  # Mac / Windows → usar binarios (más rápido)
   options(pkgType = "binary")
 } else {
-  # Linux (por ejemplo, dentro de Docker) → usar source
   options(pkgType = "source")
 }
 
 # =========================================================
-# (1) Listado de dependencias de la App
+# (1) Dependencias declaradas de la app
 # =========================================================
-
 .core <- c(
-  # --- Sistema base y estructura de app ---
   "here", "shiny", "shinydashboard", "shinydashboardPlus",
   "shinyWidgets", "shinyjs",
-
-  # --- Manipulación y limpieza de datos ---
   "readxl", "readr", "openxlsx", "dplyr", "tidyr", "janitor",
   "data.table", "stringi", "scales",
-
-  # --- Visualización y tableros ---
   "ggplot2", "highcharter", "reactable", "gt",
   "formattable", "png", "htmltools", "viridisLite",
-
-  # --- Estadística, modelado y muestreo ---
-  "stats", "MASS", "fitdistrplus", "forecast", "jfa",
-
-  # --- Utilidades y soporte ---
+  "MASS", "fitdistrplus", "forecast", "jfa",
   "RcppRoll", "sunburstR", "d3r",
-
-  # --- 🔁 Integración LLM (Ollama) + reportes DOCX ---
   "httr2", "jsonlite", "rmarkdown"
 )
 
 .heavy <- c(
-  # --- Reportes en Word y tablas ricas ---
   "kableExtra", "officer", "flextable",
-
-  # --- Gráficos y renderizado avanzado ---
   "svglite", "ragg", "systemfonts", "textshaping",
   "magick", "rsvg", "pdftools"
 )
 
 # =========================================================
-# (2) Variables de control (desde entorno)
+# (2) Variables de control
 # =========================================================
 bootstrap_flag <- Sys.getenv("APP_BOOTSTRAP", "FALSE")
-heavy_flag     <- Sys.getenv("APP_HEAVY",     "FALSE")
+heavy_flag     <- Sys.getenv("APP_HEAVY", "FALSE")
+
+is_bootstrap <- identical(toupper(bootstrap_flag), "TRUE")
+use_heavy    <- identical(toupper(heavy_flag), "TRUE")
 
 # =========================================================
-# (3) Helpers de instalación / carga
+# (3) Helpers
 # =========================================================
+.pkgs_missing <- function(pkgs) {
+  setdiff(pkgs, rownames(installed.packages()))
+}
+
 .instalar_si_faltan <- function(pkgs, force = FALSE) {
-  ya_instalados <- rownames(installed.packages())
-  faltan <- if (force) pkgs else setdiff(pkgs, ya_instalados)
-  if (length(faltan)) {
-    message("📦 Instalando paquetes: ", paste(faltan, collapse = ", "))
-    install.packages(faltan, dependencies = TRUE, quiet = TRUE)
+  installed_now <- rownames(installed.packages())
+  faltan <- if (force) pkgs else setdiff(pkgs, installed_now)
+
+  if (length(faltan) == 0) {
+    message("✅ No hay paquetes pendientes en este bloque.")
+    return(invisible(TRUE))
   }
+
+  message("📦 Instalando paquetes: ", paste(faltan, collapse = ", "))
+  install.packages(faltan, dependencies = TRUE, quiet = TRUE)
+  invisible(TRUE)
+}
+
+.verificar_sin_instalar <- function(pkgs, block_name = ".core") {
+  faltan <- .pkgs_missing(pkgs)
+  if (length(faltan) > 0) {
+    stop(
+      paste0(
+        "Faltan paquetes requeridos en runtime para ", block_name, ": ",
+        paste(faltan, collapse = ", "),
+        "\nReconstruye la imagen Docker o ejecuta APP_BOOTSTRAP=TRUE antes del runtime."
+      ),
+      call. = FALSE
+    )
+  }
+  message("✅ Runtime verificado correctamente para ", block_name)
+  invisible(TRUE)
 }
 
 .cargar_todos <- function(pkgs) {
   invisible(lapply(
     pkgs,
-    function(p)
-      suppressMessages(
+    function(p) {
+      suppressPackageStartupMessages(
         library(p, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
       )
+    }
   ))
 }
 
 # =========================================================
-# (4) Bootstrap según APP_BOOTSTRAP
+# (4) Bootstrap / Runtime
 # =========================================================
-if (identical(bootstrap_flag, "TRUE")) {
+if (is_bootstrap) {
   message("🚀 Modo BOOTSTRAP (APP_BOOTSTRAP=TRUE): instalando y cargando paquetes .core")
-  .instalar_si_faltan(.core, force = TRUE)
-} else {
-  message("⚙️  Modo RUNTIME (APP_BOOTSTRAP=FALSE): solo se verifica y cargan paquetes .core")
   .instalar_si_faltan(.core, force = FALSE)
+} else {
+  message("⚙️  Modo RUNTIME (APP_BOOTSTRAP=FALSE): no se instala nada; solo se verifica .core")
+  .verificar_sin_instalar(.core, block_name = ".core")
 }
 
 .cargar_todos(.core)
 
-# --- (4.1) Paquetes pesados solo si APP_HEAVY=TRUE ---
-if (identical(heavy_flag, "TRUE")) {
-  message("💪 APP_HEAVY=TRUE → incluyendo paquetes pesados")
-  if (identical(bootstrap_flag, "TRUE")) {
-    .instalar_si_faltan(.heavy, force = TRUE)
-  } else {
+if (use_heavy) {
+  if (is_bootstrap) {
+    message("💪 APP_HEAVY=TRUE + BOOTSTRAP: instalando y cargando paquetes pesados")
     .instalar_si_faltan(.heavy, force = FALSE)
+  } else {
+    message("💪 APP_HEAVY=TRUE + RUNTIME: verificando paquetes pesados sin instalar")
+    .verificar_sin_instalar(.heavy, block_name = ".heavy")
   }
   .cargar_todos(.heavy)
   message("✅ Paquetes pesados cargados correctamente.")
@@ -113,8 +132,10 @@ if (identical(heavy_flag, "TRUE")) {
 }
 
 # =========================================================
-# (5) Información del entorno
+# (5) Información final del entorno
 # =========================================================
-suppressMessages(library(here))
 cat("\n✅ Librerías listas y entorno inicializado correctamente.\n")
-cat("📂 Raíz del proyecto detectada por {here}: ", here(), "\n", sep = "")
+if ("here" %in% rownames(installed.packages())) {
+  suppressPackageStartupMessages(library(here, quietly = TRUE, warn.conflicts = FALSE))
+  cat("📂 Raíz del proyecto detectada por {here}: ", here(), "\n", sep = "")
+}
