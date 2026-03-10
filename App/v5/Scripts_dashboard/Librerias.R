@@ -4,23 +4,19 @@
 # Modos:
 #   APP_BOOTSTRAP=TRUE  → instala + carga paquetes
 #   APP_BOOTSTRAP=FALSE → solo verifica y carga (runtime)
-#
-# En Docker, PPM entrega binarios pre-compilados
-# para Ubuntu/Noble → sin compilación C++.
 ###############################################
 
 # =========================================================
 # (0) Configuración de repositorio
 # =========================================================
-# PPM se configura vía ENV en el Dockerfile (RENV_CONFIG_REPOS_OVERRIDE)
-# pero lo forzamos aquí también para seguridad
 os_name <- Sys.info()[["sysname"]]
 
 if (os_name == "Linux") {
-  # Linux en Docker → usar binarios de Posit Package Manager
+  # Linux / Docker → Posit Package Manager (PPM)
+  # pkgType NO se fuerza a "binary" porque Linux no lo soporta.
+  # PPM igual entrega paquetes precompilados vía "source".
   options(
-    repos   = c(PPM = "https://packagemanager.posit.co/cran/__linux__/noble/latest"),
-    pkgType = "binary"
+    repos = c(PPM = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
   )
 } else {
   # Mac / Windows → binarios nativos de CRAN
@@ -33,11 +29,8 @@ if (os_name == "Linux") {
 # =========================================================
 # (1) Dependencias declaradas de la app
 # =========================================================
-# NOTA: 'stats' fue eliminado — es paquete base de R y no
-#       se puede instalar/desinstalar con install.packages()
-
 .core <- c(
-  # --- Estructura y UI de la app ---
+  # --- Estructura y UI ---
   "here", "shiny", "shinydashboard", "shinydashboardPlus",
   "shinyWidgets", "shinyjs",
 
@@ -60,16 +53,13 @@ if (os_name == "Linux") {
 )
 
 .heavy <- c(
-  # --- Reportes Word / tablas ricas ---
   "kableExtra", "officer", "flextable",
-
-  # --- Gráficos y renderizado avanzado ---
   "svglite", "ragg", "systemfonts", "textshaping",
   "magick", "rsvg", "pdftools"
 )
 
 # =========================================================
-# (2) Variables de control (desde entorno)
+# (2) Variables de control
 # =========================================================
 bootstrap_flag <- Sys.getenv("APP_BOOTSTRAP", "FALSE")
 heavy_flag     <- Sys.getenv("APP_HEAVY",     "FALSE")
@@ -91,8 +81,7 @@ use_heavy    <- identical(toupper(heavy_flag),     "TRUE")
     return(invisible(TRUE))
   }
   message("📦 Instalando (", length(faltan), "): ", paste(faltan, collapse = ", "))
-  # dependencies=FALSE porque PPM ya incluye deps en los binarios
-  install.packages(faltan, dependencies = FALSE, quiet = TRUE)
+  install.packages(faltan, dependencies = TRUE, quiet = TRUE)
   invisible(TRUE)
 }
 
@@ -119,7 +108,7 @@ use_heavy    <- identical(toupper(heavy_flag),     "TRUE")
 }
 
 # =========================================================
-# (4) Bootstrap (build) vs Runtime (arranque del contenedor)
+# (4) Bootstrap vs Runtime
 # =========================================================
 if (is_bootstrap) {
   message("🚀 BOOTSTRAP: instalando paquetes .core")
@@ -149,6 +138,8 @@ if (use_heavy) {
 # =========================================================
 cat("\n✅ Librerías listas.\n")
 if ("here" %in% rownames(installed.packages())) {
-  suppressPackageStartupMessages(library(here, quietly = TRUE, warn.conflicts = FALSE))
+  suppressPackageStartupMessages(
+    library(here, quietly = TRUE, warn.conflicts = FALSE)
+  )
   cat("📂 Raíz del proyecto: ", here(), "\n", sep = "")
 }
