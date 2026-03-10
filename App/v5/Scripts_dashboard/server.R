@@ -2031,17 +2031,40 @@ output$download5.3 <- downloadHandler(
 
     # Reporte atributos
     generarGraficoPorcentajesAtri <- function(datosOriginales, datosMuestra) {
-      ggplot2::ggplot() +
-        ggplot2::geom_bar(data = datosOriginales, ggplot2::aes(x = Categoria, y = Porcentaje, fill = "Original"),
-                          stat = "identity", position = ggplot2::position_dodge(width = 0.8), width = 0.35) +
-        ggplot2::geom_bar(data = datosMuestra, ggplot2::aes(x = Categoria, y = Porcentaje, fill = "Muestra"),
-                          stat = "identity", position = ggplot2::position_dodge(width = 0.8), width = 0.35) +
-        ggplot2::scale_fill_manual(values = c("Original" = "lightblue", "Muestra" = "lightgreen")) +
-        ggplot2::labs(title = "Comparación de Porcentajes por Categoría", x = "Categoría", y = "Porcentaje") +
-        ggplot2::theme_minimal() +
-        ggplot2::coord_flip() +
-        ggplot2::theme(legend.position = "bottom")
-    }
+
+  # Combinar ambos datasets en uno solo con columna "Tipo"
+  # → así ggplot2 puede hacer el dodge correctamente entre las dos series
+  datosOriginales$Tipo <- "Original"
+  datosMuestra$Tipo    <- "Muestra"
+  combined <- rbind(datosOriginales, datosMuestra)
+
+  ggplot2::ggplot(combined,
+                  ggplot2::aes(x = Categoria, y = Porcentaje, fill = Tipo)) +
+    ggplot2::geom_bar(
+      stat     = "identity",
+      position = ggplot2::position_dodge(width = 0.8),
+      width    = 0.6
+    ) +
+    ggplot2::geom_text(
+      ggplot2::aes(label = paste0(round(Porcentaje, 1), "%")),
+      position = ggplot2::position_dodge(width = 0.8),
+      hjust    = -0.1,
+      size     = 3
+    ) +
+    # Colores similares a los del gráfico Highcharter en la App
+    ggplot2::scale_fill_manual(
+      values = c("Original" = "#7cb5ec", "Muestra" = "#434348")
+    ) +
+    ggplot2::labs(
+      title = "Comparación de Porcentajes por Categoría",
+      x     = "Categoría",
+      y     = "Porcentaje (%)",
+      fill  = NULL
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::coord_flip() +
+    ggplot2::theme(legend.position = "bottom")
+}
 
     output$downloadReport4 <- downloadHandler(
       filename = function() paste0("Muestreo_Atributos_", Sys.Date(), ".docx"),
